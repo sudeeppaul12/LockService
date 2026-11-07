@@ -1,53 +1,474 @@
+/* ── Reset & base ───────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f4f6f8;
-    color: #333;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    background: #f0f2f5;
+    color: #1a1a2e;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
+/* ── Header ─────────────────────────────────────────────────────────────── */
 header {
-    background-color: #17365d;
-    color: white;
-    padding: 20px;
-    text-align: center;
+    background: #17365d;
+    color: #fff;
+    padding: 0 32px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
 
+.header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.header-sub {
+    margin: 2px 0 0;
+    font-size: 0.8rem;
+    opacity: 0.75;
+}
+
+.header-user {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 0.875rem;
+}
+
+/* ── Navigation ─────────────────────────────────────────────────────────── */
 nav {
-    background-color: #24476b;
-    padding: 15px;
-    text-align: center;
+    background: #1e4a7a;
+    padding: 0 32px;
+    display: flex;
+    gap: 4px;
 }
 
 nav a {
-    color: white;
+    color: rgba(255,255,255,0.85);
     text-decoration: none;
-    margin: 15px;
+    padding: 12px 16px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-bottom: 3px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
 }
 
+nav a:hover {
+    color: #fff;
+    border-bottom-color: rgba(255,255,255,0.5);
+}
+
+/* ── Flash messages ─────────────────────────────────────────────────────── */
+.flash-container {
+    max-width: 1100px;
+    margin: 16px auto 0;
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.flash {
+    padding: 12px 18px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.flash-success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+.flash-danger  { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+.flash-warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
+.flash-info    { background: #d1ecf1; color: #0c5460; border-left: 4px solid #17a2b8; }
+
+/* ── Main content ────────────────────────────────────────────────────────── */
 main {
-    max-width: 1000px;
-    margin: 30px auto;
-    padding: 20px;
+    max-width: 1100px;
+    width: 100%;
+    margin: 24px auto;
+    padding: 0 24px;
+    flex: 1;
 }
 
-section {
-    background-color: white;
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-button {
-    background-color: #17365d;
-    color: white;
-    padding: 10px 20px;
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+.btn {
+    display: inline-block;
+    padding: 9px 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s, opacity 0.15s;
+    white-space: nowrap;
 }
 
-button:hover {
-    background-color: #28588d;
+.btn:hover { opacity: 0.88; }
+
+.btn-primary  { background: #17365d; color: #fff; }
+.btn-secondary{ background: #6c757d; color: #fff; }
+.btn-success  { background: #28a745; color: #fff; }
+.btn-danger   { background: #dc3545; color: #fff; }
+.btn-sm       { padding: 5px 12px; font-size: 0.8rem; }
+.btn-full     { width: 100%; text-align: center; }
+.btn-outline-light {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.6);
+    color: #fff;
+}
+.btn-outline-light:hover { background: rgba(255,255,255,0.12); }
+
+/* ── Page header ─────────────────────────────────────────────────────────── */
+.page-header {
+    margin-bottom: 24px;
+}
+.page-header h2 {
+    margin: 0 0 4px;
+    font-size: 1.5rem;
+    color: #17365d;
+}
+.page-header p {
+    margin: 0;
+    color: #555;
+}
+
+/* ── Dashboard sections ─────────────────────────────────────────────────── */
+.dashboard-section {
+    background: #fff;
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    gap: 12px;
+}
+
+.section-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #17365d;
+}
+
+.section-desc {
+    color: #555;
+    margin: -8px 0 16px;
+    font-size: 0.9rem;
+}
+
+/* ── Vehicle cards ───────────────────────────────────────────────────────── */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+}
+
+.vehicle-card {
+    background: #f8f9fb;
+    border: 1px solid #e3e8ef;
+    border-radius: 8px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.vehicle-icon { font-size: 1.5rem; line-height: 1; }
+
+.vehicle-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.vehicle-info strong { font-size: 0.95rem; color: #17365d; }
+
+.vehicle-vin { font-size: 0.78rem; color: #777; }
+
+/* ── Tables ──────────────────────────────────────────────────────────────── */
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.data-table th {
+    background: #f0f2f5;
+    color: #17365d;
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 2px solid #d8dde5;
+    white-space: nowrap;
+}
+
+.data-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid #eef0f3;
+    vertical-align: middle;
+}
+
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table tbody tr:hover { background: #fafbfd; }
+
+/* ── Status badges ───────────────────────────────────────────────────────── */
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-requested   { background: #e3f2fd; color: #0d47a1; }
+.status-scheduled   { background: #e8f5e9; color: #1b5e20; }
+.status-in-service  { background: #fff8e1; color: #e65100; }
+.status-completed   { background: #e8f5e9; color: #2e7d32; }
+.status-canceled    { background: #fce4ec; color: #880e4f; }
+.status-pending     { background: #fff3e0; color: #bf360c; }
+.status-approved    { background: #e8f5e9; color: #2e7d32; }
+.status-declined    { background: #fce4ec; color: #880e4f; }
+
+/* ── Estimate cards ──────────────────────────────────────────────────────── */
+.estimate-list { display: flex; flex-direction: column; gap: 14px; }
+
+.estimate-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 16px 20px;
+    background: #fafbfd;
+    border: 1px solid #e3e8ef;
+    border-left: 4px solid #ffc107;
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.estimate-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+    min-width: 160px;
+}
+
+.estimate-info strong { font-size: 0.95rem; color: #17365d; }
+.estimate-info span   { font-size: 0.85rem; color: #555; }
+
+.estimate-cost {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    min-width: 110px;
+}
+
+.cost-label { font-size: 0.75rem; color: #777; text-transform: uppercase; letter-spacing: 0.5px; }
+.cost-value { font-size: 1.3rem; font-weight: 700; color: #17365d; }
+
+.estimate-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* ── Empty states ────────────────────────────────────────────────────────── */
+.empty-state {
+    text-align: center;
+    padding: 32px 16px;
+    color: #666;
+}
+
+.empty-state p { margin: 0 0 12px; }
+
+/* ── Forms ───────────────────────────────────────────────────────────────── */
+.form-page {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0;
+}
+
+.form-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 32px;
+    width: 100%;
+    max-width: 640px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.form-card-header {
+    margin-bottom: 24px;
+}
+
+.form-card-header h2 {
+    margin: 0 0 4px;
+    color: #17365d;
+    font-size: 1.3rem;
+}
+
+.form-card-header p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 10px 12px;
+    border: 1px solid #cdd3da;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: #1a1a2e;
+    background: #fff;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #17365d;
+    box-shadow: 0 0 0 3px rgba(23,54,93,0.12);
+}
+
+.form-group textarea { resize: vertical; min-height: 90px; }
+
+.field-hint {
+    font-size: 0.78rem;
+    color: #777;
+}
+
+.field-hint a { color: #1e4a7a; }
+
+.required { color: #dc3545; }
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+/* ── Auth page ───────────────────────────────────────────────────────────── */
+.auth-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 16px 0;
+}
+
+.auth-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 36px 40px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.auth-card h2 {
+    margin: 0 0 4px;
+    color: #17365d;
+    font-size: 1.4rem;
+}
+
+.auth-sub {
+    margin: 0 0 24px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.875rem;
+    color: #555;
+}
+
+.auth-switch a { color: #1e4a7a; font-weight: 600; }
+
+/* ── Staff search row ────────────────────────────────────────────────────── */
+.search-row {
+    display: flex;
+    gap: 10px;
+}
+
+.search-row input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #cdd3da;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+/* ── Utilities ───────────────────────────────────────────────────────────── */
+.text-muted { color: #888; font-size: 0.875rem; }
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 0.8rem;
+    color: #aaa;
+    background: #fff;
+    border-top: 1px solid #e8eaed;
+    margin-top: auto;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+    .form-row     { grid-template-columns: 1fr; }
+    .estimate-card { flex-direction: column; align-items: flex-start; }
+    .estimate-cost { align-items: flex-start; }
+    .header-inner { flex-direction: column; align-items: flex-start; }
+    nav { flex-wrap: wrap; }
+    nav a { padding: 10px 12px; }
+    .auth-card { padding: 24px 20px; }
 }
