@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LockService - Login</title>
+    <!-- index.html is in the root, so the CSS is inside static/ -->
+    <link rel="stylesheet" href="../static/style.css">
+    <script src="static/login.js" defer></script>
+</head>
+<body class="login-page">
+
+    <header>
+        <h1>LockService</h1>
+        <p>Vehicle Service Management System</p>
+    </header>
+
+    <div class="login-subnav">Customer &amp; Staff Portal</div>
+
+    <main class="login-container">
+        <section class="login-card">
+            <p class="login-eyebrow">LOCKSERVICE PORTAL</p>
+            <h2>Welcome Back</h2>
+            <p class="login-description">Sign in to access your dashboard.</p>
+
+            <form id="loginForm">
+                <div class="form-field">
+                    <label for="role">Account Type</label>
+                    <select id="role" name="role" required>
+                        <option value="customer">Customer</option>
+                        <option value="staff">Staff</option>
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email"
+                           placeholder="Enter your email" autocomplete="username" required>
+                </div>
+
+                <div class="form-field">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password"
+                           placeholder="Enter your password" autocomplete="current-password" required>
+                </div>
+
+                <label class="show-password-option" for="showPassword">
+                    <input type="checkbox" id="showPassword"> Show password
+                </label>
+
+                <p id="loginMessage" class="login-message" role="status" aria-live="polite"></p>
+
+                <button type="submit" class="sign-in-button">Sign In</button>
+                <button type="button" class="demo-button" id="fillDemo">Fill Demo Credentials</button>
+            </form>
+
+            <p class="signup-text">Don't have an account? <span>Registration coming soon.</span></p>
+        </section>
+        <p class="login-footnote">Frontend demo only. Real authentication will be added with the backend.</p>
+    </main>
+</body>
+</html>
