@@ -1,0 +1,20 @@
+/* Staff dashboard - service requests */
+
+#requests-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#requests-table th,
+#requests-table td {
+    padding: 12px 18px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+#appoinment-details {
+    margin-top: 24px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}

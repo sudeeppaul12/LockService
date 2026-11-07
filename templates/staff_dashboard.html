@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LockService - Staff Dashboard</title>
     <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/css/staff.css">
 </head>
 <body>
 
@@ -27,13 +28,30 @@
         <section id="requests">
             <h3>Incoming Service Requests</h3>
             <p>Review requests submitted by customers.</p>
-            <button type="button">Review Requests</button>
+
+            <table id ="requests-table">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Vehicle</th>
+                        <th>Service Type</th>
+                        <th>Preferred Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody id ="requests-table-body">
+                    <!-- JS will insert request data here -->
+                </tbody>
+            </table>
         </section>
 
-        <section id="appointments">
+        <section id="appointments" hidden>
             <h3>Appointment Management</h3>
-            <p>Confirm, reschedule, or cancel appointments.</p>
-            <button type="button">Manage Appointments</button>
+            <div id="appointment-details">
+                <p>Select a request to manage its appoinment.</p>
+            </div>
         </section>
 
         <section id="estimates">
@@ -55,6 +73,6 @@
             <button type="button">Search</button>
         </section>
     </main>
-
+    <script type="module" src="/static/js/staff/main.js"></script>
 </body>
 </html>
