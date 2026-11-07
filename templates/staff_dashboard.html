@@ -1,3 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Staff Dashboard — LockService{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h2>Staff Dashboard</h2>
+    <p>Manage service requests, appointments, estimates, and customer records.</p>
+</div>
+
+<section id="requests" class="dashboard-section">
+    <div class="section-header">
+        <h3>Incoming Service Requests</h3>
+        <button type="button" class="btn btn-primary">Review Requests</button>
+    </div>
+    <p>Review requests submitted by customers.</p>
+</section>
+
+<section id="appointments" class="dashboard-section">
+    <div class="section-header">
+        <h3>Appointment Management</h3>
+        <button type="button" class="btn btn-primary">Manage Appointments</button>
+    </div>
+    <p>Confirm, reschedule, or cancel appointments.</p>
+</section>
+
+<section id="estimates" class="dashboard-section">
+    <div class="section-header">
+        <h3>Estimate Management</h3>
+        <button type="button" class="btn btn-primary">Manage Estimates</button>
+    </div>
+    <p>Create and update estimated repair costs.</p>
+</section>
+
+<section id="status" class="dashboard-section">
+    <div class="section-header">
+        <h3>Service Status</h3>
+        <button type="button" class="btn btn-primary">Update Service Status</button>
+    </div>
+    <p>Update service progress and record completed work.</p>
+</section>
+
+<section id="search" class="dashboard-section">
+    <div class="section-header">
+        <h3>Customer and Vehicle Search</h3>
+    </div>
+    <div class="search-row">
+        <input type="text" placeholder="Enter customer name, email, phone, or vehicle VIN">
+        <button type="button" class="btn btn-primary">Search</button>
+    </div>
+</section>
+
+{% endblock %}
 
 <!DOCTYPE html>
 <html lang="en">

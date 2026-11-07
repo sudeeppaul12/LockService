@@ -1,51 +1,150 @@
+{% extends "base.html" %}
+{% block title %}Customer Dashboard — LockService{% endblock %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LockService - Customer Dashboard</title>
-    <link rel="stylesheet" href="../static/style.css">
-</head>
-<body>
+{% block content %}
 
-    <header>
-        <h1>LockService</h1>
-        <p>Customer Dashboard</p>
-    </header>
+<div class="page-header">
+    <h2>My Dashboard</h2>
+    <p>Manage your vehicles, track service requests, and review estimates.</p>
+</div>
 
-    <nav>
-        <a href="#vehicles">My Vehicles</a>
-        <a href="#appointments">My Appointments</a>
-        <a href="#estimates">Estimates</a>
-        <a href="#history">Service History</a>
-    </nav>
+<!-- ── My Vehicles (FR-02) ─────────────────────────────────────── -->
+<section id="vehicles" class="dashboard-section">
+    <div class="section-header">
+        <h3>My Vehicles</h3>
+        <a href="{{ url_for('add_vehicle_view') }}" class="btn btn-primary">+ Add Vehicle</a>
+    </div>
 
-    <main>
-        <h2>Welcome to LockService</h2>
+    {% if vehicles %}
+    <div class="card-grid">
+        {% for v in vehicles %}
+        <div class="vehicle-card">
+            <div class="vehicle-icon">🚗</div>
+            <div class="vehicle-info">
+                <strong>{{ v.year }} {{ v.make }} {{ v.model }}</strong>
+                <span class="vehicle-vin">VIN: {{ v.vin }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>You have no registered vehicles yet.</p>
+        <a href="{{ url_for('add_vehicle_view') }}" class="btn btn-primary">Register Your First Vehicle</a>
+    </div>
+    {% endif %}
+</section>
 
-        <section id="vehicles">
-            <h3>My Vehicles</h3>
-            <p>View and manage your registered vehicles.</p>
-            <button type="button">Add Vehicle</button>
-        </section>
+<!-- ── My Appointments / Active Service Requests (FR-11) ──────── -->
+<section id="appointments" class="dashboard-section">
+    <div class="section-header">
+        <h3>My Appointments</h3>
+        <a href="{{ url_for('request_service') }}" class="btn btn-primary">+ Request Service</a>
+    </div>
 
-        <section id="appointments">
-            <h3>My Appointments</h3>
-            <p>View current service requests and appointments.</p>
-            <button type="button">Request Service</button>
-        </section>
+    {% if appointments %}
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Vehicle</th>
+                    <th>Service Type</th>
+                    <th>Preferred Date</th>
+                    <th>Status</th>
+                    <th>Estimate</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appt in appointments %}
+                <tr>
+                    <td>{{ appt.year }} {{ appt.make }} {{ appt.model }}</td>
+                    <td>{{ appt.service_type }}</td>
+                    <td>{{ appt.appointment_date }}</td>
+                    <td>
+                        <span class="status-badge status-{{ appt.status | lower | replace(' ', '-') }}">
+                            {{ appt.status }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if appt.estimated_cost %}
+                            ${{ "%.2f" | format(appt.estimated_cost) }}
+                            {% if appt.approval_status %}
+                            <span class="status-badge status-{{ appt.approval_status | lower }}">
+                                {{ appt.approval_status }}
+                            </span>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">Pending</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>You have no active service requests.</p>
+        {% if vehicles %}
+        <a href="{{ url_for('request_service') }}" class="btn btn-primary">Submit a Service Request</a>
+        {% else %}
+        <p class="text-muted">Register a vehicle first to submit a service request.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+</section>
 
-        <section id="estimates">
-            <h3>Repair Estimates</h3>
-            <p>Review estimated repair costs and approve or decline them.</p>
-        </section>
+<!-- ── Repair Estimates (FR-12) ───────────────────────────────── -->
+<section id="estimates" class="dashboard-section">
+    <div class="section-header">
+        <h3>Repair Estimates</h3>
+    </div>
 
-        <section id="history">
-            <h3>Service History</h3>
-            <p>View previous vehicle services and completed work.</p>
-        </section>
-    </main>
+    {% if estimates %}
+    <p class="section-desc">Review the estimated repair costs below and let us know how you would like to proceed.</p>
+    <div class="estimate-list">
+        {% for est in estimates %}
+        <div class="estimate-card">
+            <div class="estimate-info">
+                <strong>{{ est.year }} {{ est.make }} {{ est.model }}</strong>
+                <span>{{ est.service_type }}</span>
+                <span class="text-muted">Preferred date: {{ est.appointment_date }}</span>
+            </div>
+            <div class="estimate-cost">
+                <span class="cost-label">Estimated Cost</span>
+                <span class="cost-value">${{ "%.2f" | format(est.estimated_cost) }}</span>
+            </div>
+            <div class="estimate-actions">
+                <form method="POST"
+                      action="{{ url_for('respond_estimate', estimate_id=est.estimate_id) }}">
+                    <input type="hidden" name="decision" value="Approved">
+                    <button type="submit" class="btn btn-success">Approve</button>
+                </form>
+                <form method="POST"
+                      action="{{ url_for('respond_estimate', estimate_id=est.estimate_id) }}"
+                      onsubmit="return confirm('Are you sure you want to decline this estimate? The service request will be canceled.')">
+                    <input type="hidden" name="decision" value="Declined">
+                    <button type="submit" class="btn btn-danger">Decline</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>No estimates are waiting for your review right now.</p>
+        <p class="text-muted">When the service team provides a cost estimate, it will appear here.</p>
+    </div>
+    {% endif %}
+</section>
 
-</body>
-</html>
+<!-- ── Quick link to service history (FR-13 is on its own page) ── -->
+<section id="history" class="dashboard-section">
+    <div class="section-header">
+        <h3>Service History</h3>
+        <a href="{{ url_for('service_history') }}" class="btn btn-secondary">View Full History</a>
+    </div>
+    <p>View a complete record of all past services performed on your registered vehicles.</p>
+</section>
+
+{% endblock %}

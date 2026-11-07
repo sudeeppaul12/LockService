@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Request Service — LockService{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <div class="form-card">
+        <div class="form-card-header">
+            <h2>Request a Service Appointment</h2>
+            <p>Fill in the details below and our service team will confirm your appointment.</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('request_service') }}" novalidate>
+
+            <div class="form-group">
+                <label for="vehicle_id">Vehicle <span class="required">*</span></label>
+                <select id="vehicle_id" name="vehicle_id" required>
+                    <option value="">— Select your vehicle —</option>
+                    {% for v in vehicles %}
+                    <option value="{{ v.vehicle_id }}"
+                        {% if form_vehicle == v.vehicle_id|string %}selected{% endif %}>
+                        {{ v.year }} {{ v.make }} {{ v.model }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <span class="field-hint">
+                    Don't see your vehicle?
+                    <a href="{{ url_for('add_vehicle_view') }}">Register it first.</a>
+                </span>
+            </div>
+
+            <div class="form-group">
+                <label for="appointment_date">Preferred Appointment Date <span class="required">*</span></label>
+                <input type="date" id="appointment_date" name="appointment_date"
+                       value="{{ form_date or '' }}"
+                       required>
+                <span class="field-hint">We will confirm or offer an alternative date if needed.</span>
+            </div>
+
+            <div class="form-group">
+                <label for="service_type">Service Type <span class="required">*</span></label>
+                <select id="service_type" name="service_type" required>
+                    <option value="">— Select a service type —</option>
+                    {% set selected_type = form_type or '' %}
+                    <option value="Oil Change"             {% if selected_type == 'Oil Change' %}selected{% endif %}>Oil Change</option>
+                    <option value="Tire Rotation"          {% if selected_type == 'Tire Rotation' %}selected{% endif %}>Tire Rotation</option>
+                    <option value="Brake Service"          {% if selected_type == 'Brake Service' %}selected{% endif %}>Brake Service</option>
+                    <option value="Battery Replacement"    {% if selected_type == 'Battery Replacement' %}selected{% endif %}>Battery Replacement</option>
+                    <option value="Engine Diagnostic"      {% if selected_type == 'Engine Diagnostic' %}selected{% endif %}>Engine Diagnostic</option>
+                    <option value="Transmission Service"   {% if selected_type == 'Transmission Service' %}selected{% endif %}>Transmission Service</option>
+                    <option value="AC Service"             {% if selected_type == 'AC Service' %}selected{% endif %}>AC / Heating Service</option>
+                    <option value="General Inspection"     {% if selected_type == 'General Inspection' %}selected{% endif %}>General Inspection</option>
+                    <option value="Other"                  {% if selected_type == 'Other' %}selected{% endif %}>Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="problem_description">Problem Description <span class="required">*</span></label>
+                <textarea id="problem_description" name="problem_description"
+                          rows="4"
+                          placeholder="Describe the issue or service you need in as much detail as possible."
+                          required>{{ form_desc or '' }}</textarea>
+            </div>
+
+            <div class="form-actions">
+                <a href="{{ url_for('customer_dashboard') }}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Submit Request</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}
