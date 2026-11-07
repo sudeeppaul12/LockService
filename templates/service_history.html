@@ -30,7 +30,7 @@
                     <td>{{ record.notes or '—' }}</td>
                     <td>{{ record.completion_date or '—' }}</td>
                     <td>
-                        {% if record.final_cost %}
+                        {% if record.final_cost is not none %}
                             ${{ "%.2f" | format(record.final_cost) }}
                         {% else %}
                             <span class="text-muted">—</span>

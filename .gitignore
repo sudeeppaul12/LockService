@@ -1,5 +1,9 @@
+.venv/
+.DS_Store
 __pycache__/
 *.pyc
 *.db
-*.sqlite
 .env
+
+instance/
+account_logins.txt

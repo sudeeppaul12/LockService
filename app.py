@@ -5,12 +5,27 @@ from database import (
     get_vehicles_for_user, add_vehicle,
     create_appointment, get_active_appointments_for_user,
     get_pending_estimates_for_user, respond_to_estimate,
-    get_service_history_for_user
+    get_service_history_for_user, get_staff_appointments, update_staff_appointment
 )
 import functools
+import os
+import re
+import secrets
+import sqlite3
+import hmac
+import json
+from pathlib import Path
+from datetime import date
+from decimal import Decimal, InvalidOperation
+from flask import abort
 
 app = Flask(__name__)
-app.secret_key = 'lockservice-dev-secret'
+app.secret_key = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
+app.config['STAFF_INVITE_CODE'] = os.environ.get('STAFF_INVITE_CODE')
+invite_file = Path(app.instance_path) / 'staff_invites.json'
+app.config['STAFF_INVITE_CODES'] = json.loads(invite_file.read_text()) if invite_file.exists() else []
+# Initialize for both `flask --app app run` and `python app.py`.
+init_db()
 
 
 def login_required(role=None):
@@ -38,11 +53,12 @@ def login():
                         else url_for('staff_dashboard'))
 
     if request.method == 'POST':
-        email    = request.form.get('email', '').strip()
+        email    = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
         user     = get_user_by_email(email)
 
         if user and check_password_hash(user['password_hash'], password):
+            session.clear()
             session['user_id'] = user['user_id']
             session['name']    = user['name']
             session['role']    = user['role']
@@ -61,20 +77,28 @@ def register():
 
     if request.method == 'POST':
         name     = request.form.get('name', '').strip()
-        email    = request.form.get('email', '').strip()
+        email    = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
         confirm  = request.form.get('confirm_password', '')
         role     = request.form.get('role', 'customer')
 
         errors = []
-        if not name:
-            errors.append('Full name is required.')
-        if not email or '@' not in email:
+        if not name or len(name) > 100:
+            errors.append('Full name is required (maximum 100 characters).')
+        if len(email) > 254 or not re.fullmatch(r'[^\s@]+@[^\s@]+\.[^\s@]+', email):
             errors.append('A valid email address is required.')
-        if len(password) < 8:
-            errors.append('Password must be at least 8 characters.')
+        if not 8 <= len(password) <= 128:
+            errors.append('Password must be 8–128 characters.')
         if password != confirm:
             errors.append('Passwords do not match.')
+        if role not in ('customer', 'staff'):
+            errors.append('Please select a valid account type.')
+        if role == 'staff':
+            invite = app.config['STAFF_INVITE_CODE']
+            valid_codes = app.config['STAFF_INVITE_CODES'] + ([invite] if invite else [])
+            supplied_code = request.form.get('invite_code', '')
+            if not any(hmac.compare_digest(code, supplied_code) for code in valid_codes):
+                errors.append('A valid staff invitation code is required.')
         if get_user_by_email(email):
             errors.append('An account with that email already exists.')
 
@@ -84,7 +108,15 @@ def register():
             return render_template('login.html', register_mode=True,
                                    form_name=name, form_email=email)
 
-        create_user(name, email, generate_password_hash(password), role)
+        try:
+            # PBKDF2 also supports Python builds without hashlib.scrypt.
+            user_id = create_user(name, email, generate_password_hash(
+                password, method='pbkdf2:sha256:1000000'), role)
+        except sqlite3.IntegrityError:
+            flash('An account with that email already exists.', 'danger')
+            return render_template('login.html', register_mode=True,
+                                   form_name=name, form_email=email), 409
+        app.logger.info('Created account with user_id=%s', user_id)
         flash('Account created! Please log in.', 'success')
         return redirect(url_for('login'))
 
@@ -203,7 +235,8 @@ def respond_estimate(estimate_id):
         flash('Invalid response.', 'danger')
         return redirect(url_for('customer_dashboard') + '#estimates')
 
-    respond_to_estimate(estimate_id, decision, session['user_id'])
+    if not respond_to_estimate(estimate_id, decision, session['user_id']):
+        abort(404)
 
     if decision == 'Approved':
         flash('You approved the estimate. The service team has been notified.', 'success')
@@ -227,7 +260,59 @@ def service_history():
 @app.route('/staff')
 @login_required(role='staff')
 def staff_dashboard():
-    return render_template('staff_dashboard.html')
+    session.setdefault('staff_csrf', secrets.token_hex(32))
+    return render_template('staff_dashboard.html', appointments=get_staff_appointments())
+
+
+def money(value):
+    try:
+        amount = Decimal(value)
+        if not amount.is_finite() or amount < 0 or amount > 1000000 or amount != amount.quantize(Decimal('0.01')):
+            raise ValueError()
+        return float(amount)
+    except (InvalidOperation, ValueError):
+        raise ValueError('Enter a valid nonnegative cost with at most two decimal places.')
+
+
+@app.post('/staff/appointments/<int:appointment_id>/<action>')
+@login_required(role='staff')
+def staff_update(appointment_id, action):
+    token = request.form.get('csrf_token', '')
+    if not session.get('staff_csrf') or not hmac.compare_digest(session['staff_csrf'], token):
+        abort(400)
+    values = {}
+    try:
+        if action == 'appointment':
+            values['date'] = date.fromisoformat(request.form.get('appointment_date', '')).isoformat()
+            values['status'] = request.form.get('status')
+            if values['status'] not in ('Requested', 'Confirmed', 'Canceled'):
+                raise ValueError('Select a valid appointment status.')
+        elif action == 'estimate':
+            values['cost'] = money(request.form.get('estimated_cost', ''))
+        elif action == 'status':
+            values['status'] = request.form.get('status')
+            if values['status'] not in ('In Progress', 'Completed'):
+                raise ValueError('Select a valid service status.')
+            if request.form.get('estimated_cost', '').strip():
+                if values['status'] == 'Completed':
+                    raise ValueError('Send the estimate before completing service so the customer can review it.')
+                values['estimate_cost'] = money(request.form['estimated_cost'])
+            if values['status'] == 'Completed':
+                values['work'] = request.form.get('work_performed', '').strip()
+                values['notes'] = request.form.get('notes', '').strip()
+                values['cost'] = money(request.form.get('final_cost', ''))
+                if not values['work'] or len(values['work']) > 5000 or len(values['notes']) > 5000:
+                    raise ValueError('Work performed is required; text fields must be at most 5000 characters.')
+        else:
+            abort(404)
+        update_staff_appointment(appointment_id, session['user_id'], action, values)
+    except LookupError:
+        abort(404)
+    except ValueError as error:
+        flash(str(error) or 'Enter a valid appointment date.', 'danger')
+        return redirect(url_for('staff_dashboard')), 303
+    flash('Update saved. The customer can now see it on their dashboard.', 'success')
+    return redirect(url_for('staff_dashboard')), 303
 
 
 # ── App entry point ───────────────────────────────────────────────────────────

@@ -538,3 +538,7 @@ footer {
     margin-top: 20px;
     font-size: 14px;
 }
+/* Staff forms share the customer form layout. */
+.staff-form-card { margin: 20px auto; }
+.status-confirmed { background: #e8f5e9; color: #1b5e20; }
+.status-in-progress { background: #fff8e1; color: #e65100; }

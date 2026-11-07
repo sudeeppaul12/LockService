@@ -5,7 +5,7 @@
 
 <div class="page-header">
     <h2>My Dashboard</h2>
-    <p>Manage your vehicles, track service requests, and review estimates.</p>
+    <p>Manage your vehicles, track service requests, and review estimates. Refresh this page to see the latest staff updates.</p>
 </div>
 
 <!-- ── My Vehicles (FR-02) ─────────────────────────────────────── -->
@@ -52,6 +52,7 @@
                     <th>Preferred Date</th>
                     <th>Status</th>
                     <th>Estimate</th>
+                    <th>Final Cost</th>
                 </tr>
             </thead>
             <tbody>
@@ -66,7 +67,7 @@
                         </span>
                     </td>
                     <td>
-                        {% if appt.estimated_cost %}
+                        {% if appt.estimated_cost is not none %}
                             ${{ "%.2f" | format(appt.estimated_cost) }}
                             {% if appt.approval_status %}
                             <span class="status-badge status-{{ appt.approval_status | lower }}">
@@ -74,9 +75,10 @@
                             </span>
                             {% endif %}
                         {% else %}
-                            <span class="text-muted">Pending</span>
+                            <span class="text-muted">No estimate sent</span>
                         {% endif %}
                     </td>
+                    <td>{% if appt.final_cost is not none %}${{ "%.2f" | format(appt.final_cost) }}{% else %}<span class="text-muted">Not finalized</span>{% endif %}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -84,7 +86,7 @@
     </div>
     {% else %}
     <div class="empty-state">
-        <p>You have no active service requests.</p>
+        <p>You have no service requests.</p>
         {% if vehicles %}
         <a href="{{ url_for('request_service') }}" class="btn btn-primary">Submit a Service Request</a>
         {% else %}

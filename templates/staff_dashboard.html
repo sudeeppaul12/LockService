@@ -1,113 +1,53 @@
 {% extends "base.html" %}
 {% block title %}Staff Dashboard — LockService{% endblock %}
-
 {% block content %}
-
-<div class="page-header">
-    <h2>Staff Dashboard</h2>
-    <p>Manage service requests, appointments, estimates, and customer records.</p>
-</div>
-
+<div class="page-header"><h2>Staff Dashboard</h2><p>Changes save to the customer's records immediately. Refresh to see new requests and customer responses.</p></div>
 <section id="requests" class="dashboard-section">
-    <div class="section-header">
-        <h3>Incoming Service Requests</h3>
-        <button type="button" class="btn btn-primary">Review Requests</button>
-    </div>
-    <p>Review requests submitted by customers.</p>
+<h3>Review Requests</h3>
+{% for a in appointments if a.status == 'Requested' %}
+<p><a href="#appointment-{{ a.appointment_id }}">Request #{{ a.appointment_id }} — {{ a.customer_name }} — {{ a.service_type }}</a>: {{ a.problem_description }}</p>
+{% else %}<p>No new requests.</p>{% endfor %}
 </section>
-
-<section id="appointments" class="dashboard-section">
-    <div class="section-header">
-        <h3>Appointment Management</h3>
-        <button type="button" class="btn btn-primary">Manage Appointments</button>
-    </div>
-    <p>Confirm, reschedule, or cancel appointments.</p>
+<section id="appointments" class="dashboard-section"><h3>Manage Appointments</h3>
+{% for a in appointments %}
+<article id="appointment-{{ a.appointment_id }}" class="form-card staff-form-card">
+<h4>#{{ a.appointment_id }} — {{ a.customer_name }} · {{ a.year }} {{ a.make }} {{ a.model }}</h4>
+<p>{{ a.customer_email }} · VIN: {{ a.vin }}</p>
+<p>{{ a.service_type }}: {{ a.problem_description }}</p>
+<p>Date: {{ a.appointment_date }} · Status: <strong>{{ a.status }}</strong></p>
+{% if a.status not in ['Completed', 'Canceled'] %}
+<form method="post" action="{{ url_for('staff_update', appointment_id=a.appointment_id, action='appointment') }}">
+<input type="hidden" name="csrf_token" value="{{ session.staff_csrf }}">
+<div class="form-group"><label for="date-{{ a.appointment_id }}">Appointment date</label><input id="date-{{ a.appointment_id }}" type="date" name="appointment_date" value="{{ a.appointment_date }}" required></div>
+<div class="form-group"><label for="{{ loop.index }}-{{ a.appointment_id }}-status-appointment">Status</label><select id="{{ loop.index }}-{{ a.appointment_id }}-status-appointment" name="status">{% for status in ['Requested','Confirmed','Canceled'] %}<option {% if status == a.status %}selected{% endif %}>{{ status }}</option>{% endfor %}</select></div>
+<div class="form-actions"><button type="submit" class="btn btn-primary">Save Appointment</button></div></form>
+{% endif %}
+</article>
+{% else %}<p>No appointments yet.</p>{% endfor %}
 </section>
-
-<section id="estimates" class="dashboard-section">
-    <div class="section-header">
-        <h3>Estimate Management</h3>
-        <button type="button" class="btn btn-primary">Manage Estimates</button>
-    </div>
-    <p>Create and update estimated repair costs.</p>
-</section>
-
-<section id="status" class="dashboard-section">
-    <div class="section-header">
-        <h3>Service Status</h3>
-        <button type="button" class="btn btn-primary">Update Service Status</button>
-    </div>
-    <p>Update service progress and record completed work.</p>
-</section>
-
-<section id="search" class="dashboard-section">
-    <div class="section-header">
-        <h3>Customer and Vehicle Search</h3>
-    </div>
-    <div class="search-row">
-        <input type="text" placeholder="Enter customer name, email, phone, or vehicle VIN">
-        <button type="button" class="btn btn-primary">Search</button>
-    </div>
-</section>
-
+<section id="estimates" class="dashboard-section"><h3>Manage Estimates</h3>
+{% for a in appointments %}
+<div class="form-card staff-form-card"><h4>Request #{{ a.appointment_id }} — {{ a.customer_name }}</h4>
+<p>{% if a.estimated_cost is not none %}Estimate: ${{ '%.2f'|format(a.estimated_cost) }} · {{ a.approval_status }}{% else %}No estimate yet.{% endif %}</p>
+{% if a.status not in ['Completed','Canceled'] %}
+<form method="post" action="{{ url_for('staff_update', appointment_id=a.appointment_id, action='estimate') }}">
+<input type="hidden" name="csrf_token" value="{{ session.staff_csrf }}">
+<div class="form-group"><label for="estimate-{{ a.appointment_id }}">Estimated cost ($)</label><input id="estimate-{{ a.appointment_id }}" type="number" name="estimated_cost" min="0" max="1000000" step="0.01" value="{{ a.estimated_cost if a.estimated_cost is not none else '' }}" required></div>
+<div class="form-actions"><button type="submit" class="btn btn-primary">Send Estimate for Approval</button></div></form><p>Revising an estimate requires the customer's approval again.</p>
+{% endif %}</div>
+{% endfor %}</section>
+<section id="status" class="dashboard-section"><h3>Update Service Status</h3>
+{% for a in appointments %}
+<div class="form-card staff-form-card"><h4>Request #{{ a.appointment_id }} — {{ a.customer_name }} · {{ a.status }}</h4>
+{% if a.status not in ['Completed','Canceled'] %}
+<form method="post" action="{{ url_for('staff_update', appointment_id=a.appointment_id, action='status') }}">
+<input type="hidden" name="csrf_token" value="{{ session.staff_csrf }}">
+<div class="form-group"><label for="service-status-{{ a.appointment_id }}">Service status</label><select id="service-status-{{ a.appointment_id }}" name="status"><option {% if a.status == 'In Progress' %}selected{% endif %}>In Progress</option><option>Completed</option></select></div>
+<div class="form-group"><label for="work-{{ a.appointment_id }}">Work performed</label><textarea id="work-{{ a.appointment_id }}" name="work_performed" maxlength="5000" rows="4" placeholder="Describe the completed work"></textarea><span class="field-hint">Required when marking service completed.</span></div>
+<div class="form-group"><label for="notes-{{ a.appointment_id }}">Customer-visible notes</label><textarea id="notes-{{ a.appointment_id }}" name="notes" maxlength="5000" rows="3"></textarea></div>
+<div class="form-group"><label for="service-estimate-{{ a.appointment_id }}">New or revised estimate ($, optional)</label><input id="service-estimate-{{ a.appointment_id }}" type="number" name="estimated_cost" min="0" max="1000000" step="0.01"><span class="field-hint">Sends an estimate for approval with an In Progress update. Use Manage Estimates before completing service.</span></div>
+<div class="form-group"><label for="final-{{ a.appointment_id }}">Final cost ($)</label><input id="final-{{ a.appointment_id }}" type="number" name="final_cost" min="0" max="1000000" step="0.01"><span class="field-hint">Required when completed. This is the final bill, separate from the estimate.</span></div>
+<div class="form-actions"><button type="submit" class="btn btn-primary">Save Service Update</button></div></form>
+{% elif a.status == 'Completed' %}<p>{{ a.work_performed }}</p><p>{{ a.notes or '' }}</p><p>Final cost: ${{ '%.2f'|format(a.final_cost or 0) }}</p>{% endif %}
+</div>{% endfor %}</section>
 {% endblock %}
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LockService - Staff Dashboard</title>
-    <link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
-
-    <header>
-        <h1>LockService</h1>
-        <p>Staff Dashboard</p>
-    </header>
-
-    <nav>
-        <a href="#requests">Service Requests</a>
-        <a href="#appointments">Appointments</a>
-        <a href="#estimates">Estimates</a>
-        <a href="#search">Customer Search</a> 
-    </nav>
-
-    <main>
-        <h2>Welcome to the Staff Dashboard</h2>
-
-        <section id="requests">
-            <h3>Incoming Service Requests</h3>
-            <p>Review requests submitted by customers.</p>
-            <button type="button">Review Requests</button>
-        </section>
-
-        <section id="appointments">
-            <h3>Appointment Management</h3>
-            <p>Confirm, reschedule, or cancel appointments.</p>
-            <button type="button">Manage Appointments</button>
-        </section>
-
-        <section id="estimates">
-            <h3>Estimate Management</h3>
-            <p>Create and update estimated repair costs.</p>
-            <button type="button">Manage Estimates</button>
-        </section>
-
-        <section id="status">
-            <h3>Service Status</h3>
-            <p>Update service progress and record completed work.</p>
-            <button type="button">Update Service Status</button>
-        </section>
-
-        <section id="search">
-            <h3>Customer and Vehicle Search</h3>
-            <p>Search for customer accounts and registered vehicles.</p>
-            <input type="text" placeholder="Enter customer or vehicle information">
-            <button type="button">Search</button>
-        </section>
-    </main>
-
-</body>
-</html>
