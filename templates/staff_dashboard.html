@@ -41,17 +41,74 @@
                     </tr>
                 </thead>
 
-                <tbody id ="requests-table-body">
-                    <!-- JS will insert request data here -->
+                <tbody id="requests-table-body">
+                    {% for a in appointments %}
+                    <tr>
+                        <td>{{ a.customer_name }}</td>
+                        <td>{{ a.year }} {{ a.make }} {{ a.model }}</td>
+                        <td>{{ a.service_type }}</td>
+                        <td>{{ a.appointment_date }}</td>
+                        <td>{{ a.status }}</td>
+                        <td>
+                            <button type="button" onclick="reviewAppointment('{{ a.appointment_id }}')">
+                                Review
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6">No service requests found.</td>
+                    </tr>
+                    {% endfor %}    
                 </tbody>
             </table>
         </section>
 
         <section id="appointments" hidden>
             <h3>Appointment Management</h3>
-            <div id="appointment-details">
-                <p>Select a request to manage its appoinment.</p>
+
+            {% for a in appointments %}
+            <div id="appointment-{{ a.appointment_id }}" class="appointment-detail" hidden>
+
+                <h4>Request #{{ a.appointment_id }}</h4>
+
+                <p><strong>Customer:</strong> {{ a.customer_name }}</p>
+                <p><strong>Vehicle:</strong> {{ a.year }} {{ a.make }} {{ a.model }}</p>
+                <p><strong>Service:</strong> {{ a.service_type }}</p>
+                <p><strong>Description:</strong> {{ a.problem_description }}</p>
+                <p><strong>Status:</strong> {{ a.status }}</p>
+
+                {% if a.status not in ['Completed', 'Canceled'] %}
+                <form method="POST"
+                    action="{{ url_for('staff_update', appointment_id=a.appointment_id, action='appointment') }}">
+
+                    <input type="hidden"
+                        name="csrf_token"
+                        value="{{ session.staff_csrf }}">
+
+                    <label for="date-{{ a.appointment_id }}">Appointment Date</label>
+                    <input type="date"
+                        id="date-{{ a.appointment_id }}"
+                        name="appointment_date"
+                        value="{{ a.appointment_date }}"
+                        required>
+
+                    <label for="status-{{ a.appointment_id }}">Status</label>
+                    <select id="status-{{ a.appointment_id }}" name="status">
+                        {% for status in ['Requested', 'Confirmed', 'Canceled'] %}
+                        <option value="{{ status }}"
+                            {% if a.status == status %}selected{% endif %}>
+                            {{ status }}
+                        </option>
+                        {% endfor %}
+                    </select>
+
+                    <button type="submit">Save Appointment</button>
+                </form>
+                {% endif %}
+
             </div>
+            {% endfor %}
         </section>
 
         <section id="estimates">
@@ -73,6 +130,27 @@
             <button type="button">Search</button>
         </section>
     </main>
+    <!-- 
     <script type="module" src="/static/js/staff/main.js"></script>
+    -->
+
+    <script>
+        function reviewAppointment(id) {
+            const section = document.getElementById("appointments");
+
+            section.hidden = false;
+
+            document.querySelectorAll(".appointment-detail").forEach(detail => {
+                detail.hidden = true;
+            });
+
+            const selected = document.getElementById("appointment-" + id);
+
+            if (selected) {
+                selected.hidden = false;
+                section.scrollIntoView({ behavior: "smooth" });
+            }
+        }
+    </script>
 </body>
 </html>

@@ -1,2 +1,11 @@
 .venv/
 test_staff.py
+# Python cache
+__pycache__/
+*.pyc
+
+# Local database
+*.db
+
+# Local staff invitation codes
+instance/staff_invites.json

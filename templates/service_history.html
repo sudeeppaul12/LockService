@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Service History — LockService{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Service History</h2>
+    <p>A complete record of all past services performed on your vehicles.</p>
+</div>
+
+<section class="dashboard-section">
+    {% if history %}
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Vehicle</th>
+                    <th>Service Type</th>
+                    <th>Work Performed</th>
+                    <th>Notes</th>
+                    <th>Completion Date</th>
+                    <th>Final Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in history %}
+                <tr>
+                    <td>{{ record.year }} {{ record.make }} {{ record.model }}</td>
+                    <td>{{ record.service_type }}</td>
+                    <td>{{ record.work_performed }}</td>
+                    <td>{{ record.notes or '—' }}</td>
+                    <td>{{ record.completion_date or '—' }}</td>
+                    <td>
+                        {% if record.final_cost is not none %}
+                            ${{ "%.2f" | format(record.final_cost) }}
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>No completed service records found for your vehicles yet.</p>
+        <p class="text-muted">Once a service is marked complete by the service team, it will appear here.</p>
+        <a href="{{ url_for('customer_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
