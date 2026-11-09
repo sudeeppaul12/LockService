@@ -1,0 +1,78 @@
+<section id="estimates" hidden>
+    <h3>Estimate Management</h3>
+    <p>Create and update estimated repair costs.</p>
+
+    {% for a in appointments %}
+    <div id="estimate-{{ a.appointment_id }}" class="estimate-card" hidden>
+
+        <h4>Request #{{ a.appointment_id }}</h4>
+
+        <p><strong>Customer:</strong> {{ a.customer_name }}</p>
+        <p><strong>Vehicle:</strong>
+            {{ a.year }} {{ a.make }} {{ a.model }}
+        </p>
+        <p><strong>Service:</strong> {{ a.service_type }}</p>
+
+        {% if a.estimated_cost is not none %}
+        <p>
+            <strong>Current Estimate:</strong>
+            ${{ '%.2f'|format(a.estimated_cost) }}
+        </p>
+        <p>
+            <strong>Approval Status:</strong>
+            {{ a.approval_status }}
+        </p>
+        {% else %}
+        <p><strong>Current Estimate:</strong> Not provided</p>
+        {% endif %}
+
+        {% if a.status not in ['Completed', 'Canceled'] %}
+        <form method="POST" action="{{ url_for('staff_update', appointment_id=a.appointment_id, action='estimate') }}">
+
+            <input type="hidden" name="csrf_token" value="{{ session.staff_csrf }}">
+
+            <label for="estimate-cost-{{ a.appointment_id }}">
+                Estimated Repair Cost ($)
+            </label>
+
+            <input type="number" id="estimate-cost-{{ a.appointment_id }}" name="estimated_cost" min="0" max="1000000"
+                step="0.01" value="{{ a.estimated_cost if a.estimated_cost is not none else '' }}" required>
+
+            <button type="submit">Save Estimate</button>
+        </form>
+        {% endif %}
+
+        <button type="button" onclick="closeEstimate()">
+            Close
+        </button>
+    </div>
+    {% endfor %}
+</section>
+
+<script>
+    function openEstimate(id) {
+        const section = document.getElementById("estimates");
+
+        document.querySelectorAll(".estimate-card").forEach(card => {
+            card.hidden = true;
+        });
+
+        const selected = document.getElementById("estimate-" + id);
+
+        if (selected) {
+            section.hidden = false;
+            selected.hidden = false;
+            section.scrollIntoView({ behavior: "smooth" });
+        }
+    }
+
+    function closeEstimate() {
+        const section = document.getElementById("estimates");
+
+        section.hidden = true;
+
+        document.querySelectorAll(".estimate-card").forEach(card => {
+            card.hidden = true;
+        });
+    }
+</script>

@@ -12,9 +12,65 @@
     border-bottom: 1px solid #ddd;
 }
 
-#appoinment-details {
+.appoinment-details {
     margin-top: 24px;
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 8px;
+}
+
+/* Service Status */
+
+#service-select {
+    margin-bottom: 15px;
+}
+
+#status progress {
+    width: 100%;
+    height: 15px;
+}
+
+.progress-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 14px;
+}
+
+/* Customer and Vehicle Search */
+
+#search-input {
+    display: block;
+    width: 100%;
+    max-width: 400px;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+#search-results {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+#search-results th,
+#search-results td {
+    padding: 14px 18px;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid #ddd;
+}
+
+#search-results th {
+    background-color: #f3f4f6;
+}
+
+#search-results td small {
+    display: block;
+    margin-top: 5px;
+    color: #666;
+}
+
+#search-results tbody tr:hover {
+    background-color: #f8fafc;
 }

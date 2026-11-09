@@ -1,0 +1,45 @@
+<section id="requests">
+    <h3>Incoming Service Requests</h3>
+    <p>Review requests submitted by customers.</p>
+
+    <table id="requests-table">
+        <thead>
+            <tr>
+                <th>Customer</th>
+                <th>Vehicle</th>
+                <th>Service Type</th>
+                <th>Preferred Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody id="requests-table-body">
+            {% for a in appointments %}
+            <tr>
+                <td>{{ a.customer_name }}</td>
+                <td>{{ a.year }} {{ a.make }} {{ a.model }}</td>
+                <td>{{ a.service_type }}</td>
+                <td>{{ a.appointment_date }}</td>
+                <td>{{ a.status }}</td>
+                <td>
+                    <button type="button" onclick="reviewAppointment('{{ a.appointment_id }}')">
+                        Review
+                    </button>
+                
+                    {% if a.status not in ['Canceled', 'Completed'] %}
+                    <button type="button" onclick="openEstimate('{{ a.appointment_id }}')">
+                        Estimate
+                    </button>
+                    {% endif %}
+                </td>
+
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6">No service requests found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>

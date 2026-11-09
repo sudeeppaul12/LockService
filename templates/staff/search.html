@@ -1,0 +1,78 @@
+<section id="search">
+    <h3>Customer and Vehicle Search</h3>
+    <p>Find service records by customer name, email, or VIN.</p>
+
+    <label for="search-input">Search Records</label>
+    <input type="search" id="search-input" placeholder="Enter name, email, or VIN...">
+
+    <p id="search-message">Start typing to search.</p>
+
+    <table id="search-results" hidden>
+        <thead>
+            <tr>
+                <th>Customer</th>
+                <th>Vehicle</th>
+                <th>Service Request</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in appointments %}
+            <tr data-name="{{ (a.customer_name or '')|lower }}" data-email="{{ (a.customer_email or '')|lower }}"
+                data-vin="{{ (a.vin or '')|lower }}">
+
+                <td>
+                    {{ a.customer_name }}
+                    <small>{{ a.customer_email or 'No email' }}</small>
+                </td>
+
+                <td>
+                    {{ a.year }} {{ a.make }} {{ a.model }}
+                    <small>VIN: {{ a.vin or 'Not provided' }}</small>
+                </td>
+
+                <td>
+                    #{{ a.appointment_id }} - {{ a.service_type }}
+                </td>
+
+                <td>{{ a.status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<script>
+    const searchInput = document.getElementById("search-input");
+    const searchTable = document.getElementById("search-results");
+    const searchRows = document.querySelectorAll("#search-results tbody tr");
+    const searchMessage = document.getElementById("search-message");
+
+    searchInput.addEventListener("input", function () {
+        const query = this.value.trim().toLowerCase();
+        let matches = 0;
+
+        searchRows.forEach(row => {
+            const nameMatch = row.dataset.name
+                .split(/\s+/)
+                .some(word => word.startsWith(query));
+
+            const emailMatch = row.dataset.email.startsWith(query);
+            const vinMatch = row.dataset.vin.startsWith(query);
+
+            const found = query !== "" &&
+                (nameMatch || emailMatch || vinMatch);
+
+            row.hidden = !found;
+            if (found) matches++;
+        });
+
+        searchTable.hidden = matches === 0;
+
+        searchMessage.textContent = !query
+            ? "Start typing to search."
+            : matches === 0
+                ? "No matching service requests."
+                : `${matches} service request(s) found.`;
+    });
+</script>
