@@ -1,0 +1,109 @@
+<section id="status">
+    <h3>Service Status</h3>
+
+    <!-- Select a request -->
+    <label for="service-select">Service Request</label>
+    <select id="service-select">
+        <option value="">Select a request</option>
+        {% for a in appointments %}
+        {% if a.status in ['Confirmed', 'In Progress', 'Completed', 'Canceled'] %}
+        <option value="{{ a.appointment_id }}">
+            #{{ a.appointment_id }} - {{ a.customer_name }} - {{ a.make }} {{ a.model }}
+        </option>
+        {% endif %}
+        {% endfor %}
+    </select>
+
+    <!-- Display selected request -->
+    {% for a in appointments %}
+    {% if a.status in ['Confirmed', 'In Progress', 'Completed', 'Canceled'] %}
+    <div id="service-{{ a.appointment_id }}" class="service-detail" hidden>
+        <h4>Request #{{ a.appointment_id }}</h4>
+        <p><strong>Vehicle:</strong> {{ a.year }} {{ a.make }} {{ a.model }}</p>
+        <p><strong>Service:</strong> {{ a.service_type }}</p>
+        <p><strong>Status:</strong> {{ a.status }}</p>
+
+        {% if a.status != 'Canceled' %}
+        {% set level = {'Confirmed': 1, 'In Progress': 2, 'Completed': 3}[a.status] %}
+        <progress value="{{ level }}" max="3"></progress>
+        
+        <div class="progress-labels">
+            <span>Confirmed</span>
+            <span>In Progress</span>
+            <span>Completed</span>
+        </div>
+        {% endif %}
+
+        <p><strong>Estimate:</strong>
+            {% if a.estimated_cost is not none %}
+            ${{ '%.2f'|format(a.estimated_cost) }} — {{ a.approval_status }}
+            {% else %}Not provided{% endif %}
+        </p>
+
+        <!-- Start service -->
+        {% if a.status == 'Confirmed' %}
+        {% if a.estimated_cost is not none and a.approval_status == 'Approved' %}
+
+        <!-- BACKEND: Enforce approved estimate and Confirmed -> In Progress. -->
+        <form method="POST" action="{{ url_for('staff_update', appointment_id=a.appointment_id, action='status') }}"
+            onsubmit="return confirm('Start service?')">
+            <input type="hidden" name="csrf_token" value="{{ session.staff_csrf }}">
+            <input type="hidden" name="status" value="In Progress">
+            <button type="submit">Start Service →</button>
+        </form>
+        {% else %}
+        <p>Estimate approval required before starting.</p>
+        {% endif %}
+
+        <!-- Complete or cancel -->
+        {% elif a.status == 'In Progress' %}
+        <details>
+            <summary>Complete Service</summary>
+
+            <!-- BACKEND: Enforce In Progress -> Completed and validate required fields. -->
+            <form method="POST"
+                action="{{ url_for('staff_update', appointment_id=a.appointment_id, action='status') }}">
+                <input type="hidden" name="csrf_token" value="{{ session.staff_csrf }}">
+                <input type="hidden" name="status" value="Completed">
+                <label>Work Performed</label>
+                <textarea name="work_performed" required></textarea>
+                <label>Final Price ($)</label>
+                <input type="number" name="final_cost" min="0" max="1000000" step="0.01" required>
+                <label>Notes (optional)</label>
+                <textarea name="notes"></textarea>
+                <button type="submit">Save and Complete</button>
+            </form>
+        </details>
+
+        <details>
+            <summary>Cancel Service</summary>
+            <label>Cancellation Reason</label>
+            <textarea name="cancellation_reason" required></textarea>
+            <!-- BACKEND: Support In Progress -> Canceled, save reason,
+                     reject invalid transitions and require cancellation confirmation. -->
+            <button type="button" disabled>Cancel (Backend Pending)</button>
+        </details>
+
+        <!-- Read-only records -->
+        {% elif a.status == 'Completed' %}
+        <p><strong>Work:</strong> {{ a.work_performed or 'Not recorded' }}</p>
+        <p><strong>Notes:</strong> {{ a.notes or 'None' }}</p>
+        <p><strong>Final Price:</strong>
+            {{ ('$%.2f'|format(a.final_cost)) if a.final_cost is not none else 'Not recorded' }}
+        </p>
+
+        {% elif a.status == 'Canceled' %}
+        <p>This service was canceled. No further actions available.</p>
+        <!-- BACKEND: Return saved cancellation_reason for display here. -->
+        {% endif %}
+    </div>
+    {% endif %}
+    {% endfor %}
+</section>
+
+<script>
+    document.getElementById("service-select").addEventListener("change", function () {
+        document.querySelectorAll(".service-detail").forEach(d => d.hidden = true);
+        if (this.value) document.getElementById("service-" + this.value).hidden = false;
+    });
+</script>

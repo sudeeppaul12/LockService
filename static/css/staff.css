@@ -1,0 +1,140 @@
+/* Staff dashboard - service requests */
+
+#requests-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#requests-table th,
+#requests-table td {
+    padding: 12px 18px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.appoinment-details {
+    margin-top: 24px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+/* Service Status */
+
+#service-select {
+    margin-bottom: 15px;
+}
+
+#status progress {
+    width: 100%;
+    height: 15px;
+}
+
+.progress-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 14px;
+}
+
+/* Customer and Vehicle Search */
+
+#search-input {
+    display: block;
+    width: 100%;
+    max-width: 400px;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+#search-results {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+#search-results th,
+#search-results td {
+    padding: 14px 18px;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid #ddd;
+}
+
+#search-results th {
+    background-color: #f3f4f6;
+}
+
+#search-results td small {
+    display: block;
+    margin-top: 5px;
+    color: #666;
+}
+
+#search-results tbody tr:hover {
+    background-color: #f8fafc;
+}
+/* Integration: form groups inside staff partials */
+.appointment-detail,
+.service-detail {
+    margin-top: 16px;
+    padding: 20px;
+    background: #f8f9fb;
+    border: 1px solid #e3e8ef;
+    border-radius: 8px;
+}
+
+.appointment-detail h4,
+.service-detail h4 {
+    margin: 0 0 12px;
+    color: #17365d;
+}
+
+.appointment-detail label,
+.service-detail label,
+#estimates label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #333;
+    margin: 12px 0 4px;
+}
+
+.appointment-detail input,
+.appointment-detail select,
+.appointment-detail textarea,
+.service-detail input,
+.service-detail select,
+.service-detail textarea,
+#estimates input[type="number"] {
+    width: 100%;
+    max-width: 400px;
+    padding: 9px 12px;
+    border: 1px solid #cdd3da;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-family: inherit;
+}
+
+.appointment-detail button[type="submit"],
+.service-detail button[type="submit"],
+#estimates button[type="submit"] {
+    margin-top: 14px;
+    background: #17365d;
+    color: #fff;
+    padding: 9px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.appointment-detail button[type="submit"]:hover,
+.service-detail button[type="submit"]:hover,
+#estimates button[type="submit"]:hover {
+    background: #1e4a7a;
+}
+
+details { margin-top: 12px; }
+details summary { cursor: pointer; font-weight: 600; color: #17365d; padding: 6px 0; }

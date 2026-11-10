@@ -4,6 +4,6 @@ __pycache__/
 *.pyc
 *.db
 .env
-
 instance/
 account_logins.txt
+staff_invites.json

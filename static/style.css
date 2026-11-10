@@ -248,7 +248,9 @@ main {
 
 .status-requested   { background: #e3f2fd; color: #0d47a1; }
 .status-scheduled   { background: #e8f5e9; color: #1b5e20; }
+.status-confirmed   { background: #e8f5e9; color: #1b5e20; }
 .status-in-service  { background: #fff8e1; color: #e65100; }
+.status-in-progress { background: #fff8e1; color: #e65100; }
 .status-completed   { background: #e8f5e9; color: #2e7d32; }
 .status-canceled    { background: #fce4ec; color: #880e4f; }
 .status-pending     { background: #fff3e0; color: #bf360c; }
