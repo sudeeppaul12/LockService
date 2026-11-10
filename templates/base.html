@@ -1,45 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}LockService{% endblock %}</title>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    {% if session.get('role') == 'staff' %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/staff.css') }}">
+    {% endif %}
 </head>
-<body>
 
-<header>
-    <div class="header-inner">
-        <div>
-            <h1>LockService</h1>
-            <p class="header-sub">Vehicle Service Management System</p>
-        </div>
-        {% if session.user_id %}
-        <div class="header-user">
-            <span>Welcome, {{ session.name }}</span>
-            <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">Log Out</a>
-        </div>
-        {% endif %}
-    </div>
-</header>
+<body class="{{ 'staff-page' if session.get('role') == 'staff' else '' }}">
 
-{% if session.user_id %}
-<nav>
-    {% if session.role == 'customer' %}
+    <header>
+        <div class="header-inner">
+            <div>
+                <h1>LockService</h1>
+                <p class="header-sub">Vehicle Service Management System</p>
+            </div>
+
+            {% if session.get('user_id') %}
+            <div class="header-user">
+                <span>Welcome, {{ session.name }}</span>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">Log Out</a>
+            </div>
+            {% endif %}
+        </div>
+    </header>
+
+    {% if session.get('user_id') %}
+    <nav>
+        {% if session.role == 'customer' %}
         <a href="{{ url_for('customer_dashboard') }}#vehicles">My Vehicles</a>
         <a href="{{ url_for('customer_dashboard') }}#appointments">My Appointments</a>
         <a href="{{ url_for('customer_dashboard') }}#estimates">Estimates</a>
         <a href="{{ url_for('service_history') }}">Service History</a>
-    {% elif session.role == 'staff' %}
+
+        {% elif session.role == 'staff' %}
         <a href="{{ url_for('staff_dashboard') }}#requests">Service Requests</a>
         <a href="{{ url_for('staff_dashboard') }}#appointments">Appointments</a>
         <a href="{{ url_for('staff_dashboard') }}#estimates">Estimates</a>
+        <a href="{{ url_for('staff_dashboard') }}#status">Service Status</a>
         <a href="{{ url_for('staff_dashboard') }}#search">Customer Search</a>
+        {% endif %}
+    </nav>
     {% endif %}
-</nav>
-{% endif %}
 
-{% with messages = get_flashed_messages(with_categories=true) %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     <div class="flash-container">
         {% for category, message in messages %}
@@ -47,15 +57,16 @@
         {% endfor %}
     </div>
     {% endif %}
-{% endwith %}
+    {% endwith %}
 
-<main>
-    {% block content %}{% endblock %}
-</main>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
 
-<footer>
-    <p>LockService &copy; 2026 &mdash; YoToYa Team</p>
-</footer>
+    <footer>
+        <p>LockService &copy; 2026 &mdash; YoToYa Team</p>
+    </footer>
 
 </body>
+
 </html>

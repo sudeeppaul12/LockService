@@ -1,40 +1,18 @@
+{% extends "base.html" %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LockService - Staff Dashboard</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <link rel="stylesheet" href="/static/css/staff.css">
-</head>
-<body>
+{% block title %}Staff Dashboard - LockService{% endblock %}
 
-    <header>
-        <h1>LockService</h1>
-        <p>Staff Dashboard</p>
-    </header>
+{% block content %}
 
-    <nav>
-        <a href="#requests">Service Requests</a>
-        <a href="#appointments">Appointments</a>
-        <a href="#estimates">Estimates</a>
-        <a href="#search">Customer Search</a> 
-    </nav>
+<div class="page-header">
+    <h2>Staff Dashboard</h2>
+    <p>Manage service requests, appointments, and repairs.</p>
+</div>
 
-    <main>
-        <h2>Welcome to the Staff Dashboard</h2>
-        
-        {% include "staff/requests.html" %}
-        
-        {% include "staff/appointments.html" %}
+{% include "staff/requests.html" %}
+{% include "staff/appointments.html" %}
+{% include "staff/estimates.html" %}
+{% include "staff/service_status.html" %}
+{% include "staff/search.html" %}
 
-        {% include "staff/estimates.html" %}
-
-        {% include "staff/service_status.html" %}
-
-        {% include "staff/search.html" %}
-    </main>
-
-</body>
-</html>
+{% endblock %}

@@ -1,4 +1,14 @@
-/* Staff dashboard - service requests */
+/* Staff Dashboard Sections */
+
+body.staff-page main>section {
+    background: #fff;
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Service Requests Table */
 
 #requests-table {
     width: 100%;
@@ -12,17 +22,79 @@
     border-bottom: 1px solid #ddd;
 }
 
-.appoinment-details {
+/* Appointment Management */
+
+.appointment-detail {
     margin-top: 24px;
     padding: 20px;
-    border: 1px solid #ddd;
+    border: 1px solid #e3e8ef;
     border-radius: 8px;
+    background: #fafbfd;
+}
+
+.staff-appointment-form {
+    margin-top: 20px;
+}
+
+.staff-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.staff-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.staff-field label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.staff-field input,
+.staff-field select,
+.staff-field textarea,
+#service-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cdd3da;
+    border-radius: 6px;
+    background: #fff;
+    color: #1a1a2e;
+    font: inherit;
+}
+
+.staff-field input:focus,
+.staff-field select:focus,
+.staff-field textarea:focus,
+#service-select:focus {
+    outline: none;
+    border-color: #17365d;
+    box-shadow: 0 0 0 3px rgba(23, 54, 93, 0.12);
+}
+
+.staff-field textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+.staff-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 12px;
 }
 
 /* Service Status */
 
 #service-select {
-    margin-bottom: 15px;
+    display: block;
+    width: 100%;
+    max-width: 440px;
+    margin: 10px 0 20px;
 }
 
 #status progress {
@@ -37,6 +109,46 @@
     font-size: 14px;
 }
 
+.service-detail {
+    margin-top: 24px;
+}
+
+.staff-confirm summary {
+    list-style: none;
+    cursor: pointer;
+    width: fit-content;
+}
+
+.staff-confirm summary::-webkit-details-marker {
+    display: none;
+}
+
+.staff-confirm-content {
+    margin-top: 14px;
+    padding: 16px;
+    background: #f8f9fb;
+    border: 1px solid #e3e8ef;
+    border-radius: 8px;
+}
+
+.staff-action-details {
+    margin-top: 12px;
+    padding: 14px 16px;
+    border: 1px solid #e3e8ef;
+    border-radius: 8px;
+    background: #fafbfd;
+}
+
+.staff-action-details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: #17365d;
+}
+
+.staff-service-form {
+    margin-top: 18px;
+}
+
 /* Customer and Vehicle Search */
 
 #search-input {
@@ -45,6 +157,9 @@
     max-width: 400px;
     padding: 10px;
     margin: 10px 0;
+    border: 1px solid #cdd3da;
+    border-radius: 6px;
+    font: inherit;
 }
 
 #search-results {
@@ -73,4 +188,53 @@
 
 #search-results tbody tr:hover {
     background-color: #f8fafc;
+}
+
+/* Staff Buttons Without Shared .btn Class */
+
+body.staff-page button:not(.btn) {
+    background: #17365d;
+    color: #fff;
+    padding: 9px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+body.staff-page button:not(.btn):hover {
+    background: #28588d;
+}
+
+body.staff-page button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Preserve Hidden Panels */
+
+body.staff-page [hidden] {
+    display: none !important;
+}
+
+/* Prevent Shared Estimate Card Layout Conflicts */
+
+body.staff-page .estimate-card {
+    display: block;
+}
+
+/* Responsive Layout */
+
+@media (max-width: 600px) {
+    .staff-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .staff-form-actions {
+        justify-content: stretch;
+    }
+
+    .staff-form-actions button {
+        width: 100%;
+    }
 }
