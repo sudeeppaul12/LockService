@@ -169,6 +169,29 @@ def respond_to_estimate(estimate_id, decision, user_id):
         conn.close()
 
 
+# ── Reschedule confirmation helper ──────────────────────────────────────────
+
+def confirm_reschedule(appointment_id, user_id, decision):
+    conn = get_db()
+    try:
+        with conn:
+            appt = conn.execute(
+                '''SELECT a.appointment_id FROM appointments a
+                   JOIN vehicles v ON v.vehicle_id = a.vehicle_id
+                   WHERE a.appointment_id = ? AND v.user_id = ? AND a.status = 'Rescheduled' ''',
+                (appointment_id, user_id)
+            ).fetchone()
+            if not appt:
+                return False
+            conn.execute(
+                'UPDATE appointments SET status = ? WHERE appointment_id = ?',
+                (decision, appointment_id)
+            )
+            return True
+    finally:
+        conn.close()
+
+
 # ── Service history helpers ──────────────────────────────────────────────────
 
 def get_service_history_for_user(user_id):

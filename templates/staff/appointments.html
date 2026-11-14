@@ -33,7 +33,7 @@
                         Status
                     </label>
                     <select id="status-{{ a.appointment_id }}" name="status">
-                        {% for status in ['Requested', 'Confirmed', 'Canceled'] %}
+                        {% for status in ['Requested', 'Confirmed', 'Rescheduled', 'Canceled'] %}
                         <option value="{{ status }}" {% if a.status==status %}selected{% endif %}>
                             {{ status }}
                         </option>
@@ -41,6 +41,11 @@
                     </select>
                 </div>
             </div>
+
+            <p class="staff-form-hint">
+                Set status to <strong>Rescheduled</strong> to propose a new date — the customer
+                will be asked to confirm or decline it on their dashboard.
+            </p>
 
             <div class="staff-form-actions">
                 <button type="submit" class="btn btn-primary">

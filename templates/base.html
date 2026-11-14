@@ -33,6 +33,7 @@
 
     {% if session.get('user_id') %}
     <nav>
+        <div class="nav-inner">
         {% if session.role == 'customer' %}
         <a href="{{ url_for('customer_dashboard') }}#vehicles">My Vehicles</a>
         <a href="{{ url_for('customer_dashboard') }}#appointments">My Appointments</a>
@@ -46,6 +47,7 @@
         <a href="{{ url_for('staff_dashboard') }}#status">Service Status</a>
         <a href="{{ url_for('staff_dashboard') }}#search">Customer Search</a>
         {% endif %}
+        </div>
     </nav>
     {% endif %}
 

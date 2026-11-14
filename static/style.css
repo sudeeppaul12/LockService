@@ -58,7 +58,12 @@ header h1 {
 /* ── Navigation ─────────────────────────────────────────────────────────── */
 nav {
     background: #1e4a7a;
-    padding: 0 32px;
+    padding: 0 24px;
+}
+
+.nav-inner {
+    max-width: 1100px;
+    margin: 0 auto;
     display: flex;
     gap: 4px;
 }

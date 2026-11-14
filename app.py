@@ -5,7 +5,8 @@ from database import (
     get_vehicles_for_user, add_vehicle,
     create_appointment, get_active_appointments_for_user,
     get_pending_estimates_for_user, respond_to_estimate,
-    get_service_history_for_user, get_staff_appointments, update_staff_appointment
+    get_service_history_for_user, get_staff_appointments, update_staff_appointment,
+    confirm_reschedule
 )
 import functools
 import os
@@ -165,6 +166,8 @@ def add_vehicle_view():
             errors.append('Please enter a valid 4-digit year.')
         if not vin:
             errors.append('VIN is required.')
+        elif len(vin) > 17:
+            errors.append('VIN must be 17 characters or fewer.')
 
         if errors:
             for e in errors:
@@ -246,6 +249,27 @@ def respond_estimate(estimate_id):
     return redirect(url_for('customer_dashboard') + '#estimates')
 
 
+# ── Reschedule response (FR-11) ──────────────────────────────────────────────
+
+@app.route('/customer/appointments/<int:appointment_id>/reschedule-response', methods=['POST'])
+@login_required(role='customer')
+def reschedule_response(appointment_id):
+    decision = request.form.get('decision', '')
+    if decision not in ('Confirmed', 'Canceled'):
+        flash('Invalid response.', 'danger')
+        return redirect(url_for('customer_dashboard') + '#appointments')
+
+    if not confirm_reschedule(appointment_id, session['user_id'], decision):
+        abort(404)
+
+    if decision == 'Confirmed':
+        flash('You confirmed the new appointment date.', 'success')
+    else:
+        flash('You declined the rescheduled date. The appointment has been canceled.', 'info')
+
+    return redirect(url_for('customer_dashboard') + '#appointments')
+
+
 # ── Service history (FR-13) ───────────────────────────────────────────────────
 
 @app.route('/customer/history')
@@ -285,7 +309,7 @@ def staff_update(appointment_id, action):
         if action == 'appointment':
             values['date'] = date.fromisoformat(request.form.get('appointment_date', '')).isoformat()
             values['status'] = request.form.get('status')
-            if values['status'] not in ('Requested', 'Confirmed', 'Canceled'):
+            if values['status'] not in ('Requested', 'Confirmed', 'Rescheduled', 'Canceled'):
                 raise ValueError('Select a valid appointment status.')
         elif action == 'estimate':
             values['cost'] = money(request.form.get('estimated_cost', ''))

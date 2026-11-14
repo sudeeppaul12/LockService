@@ -3,7 +3,7 @@
     <p>Find service records by customer name, email, or VIN.</p>
 
     <label for="search-input">Search Records</label>
-    <input type="search" id="search-input" placeholder="Enter name, email, or VIN...">
+    <input type="search" id="search-input" placeholder="Enter name, email, make, model, or VIN...">
 
     <p id="search-message">Start typing to search.</p>
 
@@ -19,7 +19,8 @@
         <tbody>
             {% for a in appointments %}
             <tr data-name="{{ (a.customer_name or '')|lower }}" data-email="{{ (a.customer_email or '')|lower }}"
-                data-vin="{{ (a.vin or '')|lower }}">
+                data-vin="{{ (a.vin or '')|lower }}"
+                data-make="{{ (a.make or '')|lower }}" data-model="{{ (a.model or '')|lower }}">
 
                 <td>
                     {{ a.customer_name }}
@@ -59,9 +60,11 @@
 
             const emailMatch = row.dataset.email.startsWith(query);
             const vinMatch = row.dataset.vin.startsWith(query);
+            const makeMatch = row.dataset.make.startsWith(query);
+            const modelMatch = row.dataset.model.startsWith(query);
 
             const found = query !== "" &&
-                (nameMatch || emailMatch || vinMatch);
+                (nameMatch || emailMatch || vinMatch || makeMatch || modelMatch);
 
             row.hidden = !found;
             if (found) matches++;

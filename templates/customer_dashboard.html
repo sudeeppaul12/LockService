@@ -60,11 +60,30 @@
                 <tr>
                     <td>{{ appt.year }} {{ appt.make }} {{ appt.model }}</td>
                     <td>{{ appt.service_type }}</td>
-                    <td>{{ appt.appointment_date }}</td>
+                    <td>
+                        {{ appt.appointment_date }}
+                    </td>
                     <td>
                         <span class="status-badge status-{{ appt.status | lower | replace(' ', '-') }}">
                             {{ appt.status }}
                         </span>
+                        {% if appt.status == 'Rescheduled' %}
+                        <div class="reschedule-actions">
+                            <form method="POST"
+                                  action="{{ url_for('reschedule_response', appointment_id=appt.appointment_id) }}"
+                                  style="display:inline">
+                                <input type="hidden" name="decision" value="Confirmed">
+                                <button type="submit" class="btn btn-success btn-sm">Confirm date</button>
+                            </form>
+                            <form method="POST"
+                                  action="{{ url_for('reschedule_response', appointment_id=appt.appointment_id) }}"
+                                  style="display:inline"
+                                  onsubmit="return confirm('Decline this rescheduled date? The appointment will be canceled.')">
+                                <input type="hidden" name="decision" value="Canceled">
+                                <button type="submit" class="btn btn-danger btn-sm">Decline</button>
+                            </form>
+                        </div>
+                        {% endif %}
                     </td>
                     <td>
                         {% if appt.estimated_cost is not none %}
