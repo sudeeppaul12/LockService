@@ -1,0 +1,24 @@
+test_authentication_and_role_guards (test_backend.BackendTests.test_authentication_and_role_guards) ... ok
+test_bad_credentials_and_sql_injection (test_backend.BackendTests.test_bad_credentials_and_sql_injection) ... ok
+test_completion_history_and_terminal_guard (test_backend.BackendTests.test_completion_history_and_terminal_guard) ... ok
+test_current_and_future_service_dates (test_backend.BackendTests.test_current_and_future_service_dates) ... ok
+test_database_foreign_keys_and_persistence (test_backend.BackendTests.test_database_foreign_keys_and_persistence) ... ok
+test_duplicate_email_constraint (test_backend.BackendTests.test_duplicate_email_constraint) ... ok
+test_estimate_ownership_decline_and_replay (test_backend.BackendTests.test_estimate_ownership_decline_and_replay) ... ok
+test_invalid_registration_branches (test_backend.BackendTests.test_invalid_registration_branches) ... ok
+test_invalid_service_date (test_backend.BackendTests.test_invalid_service_date) ... ok
+test_known_gap_customer_csrf (test_backend.BackendTests.test_known_gap_customer_csrf) ... expected failure
+test_money_boundaries (test_backend.BackendTests.test_money_boundaries) ... ok
+test_registration_hash_and_login_logout (test_backend.BackendTests.test_registration_hash_and_login_logout) ... ok
+test_rendered_pages (test_backend.BackendTests.test_rendered_pages) ... ok
+test_service_request_ownership (test_backend.BackendTests.test_service_request_ownership) ... ok
+test_staff_csrf_and_missing_appointment (test_backend.BackendTests.test_staff_csrf_and_missing_appointment) ... ok
+test_staff_date_validation (test_backend.BackendTests.test_staff_date_validation) ... ok
+test_staff_invitation (test_backend.BackendTests.test_staff_invitation) ... ok
+test_transaction_rollback (test_backend.BackendTests.test_transaction_rollback) ... ok
+test_vehicle_validation_and_creation (test_backend.BackendTests.test_vehicle_validation_and_creation) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 1.943s
+
+OK (expected failures=1)

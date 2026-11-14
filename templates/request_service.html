@@ -31,9 +31,9 @@
             <div class="form-group">
                 <label for="appointment_date">Preferred Appointment Date <span class="required">*</span></label>
                 <input type="date" id="appointment_date" name="appointment_date"
-                       value="{{ form_date or '' }}"
+                       value="{{ form_date or '' }}" min="{{ today }}"
                        required>
-                <span class="field-hint">We will confirm or offer an alternative date if needed.</span>
+                <span class="field-hint">Choose today or a future date. We will confirm or offer an alternative date if needed.</span>
             </div>
 
             <div class="form-group">

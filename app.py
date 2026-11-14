@@ -196,15 +196,20 @@ def request_service():
 
     if request.method == 'POST':
         vehicle_id   = request.form.get('vehicle_id', '')
-        date         = request.form.get('appointment_date', '').strip()
+        appointment_date = request.form.get('appointment_date', '').strip()
         service_type = request.form.get('service_type', '').strip()
         description  = request.form.get('problem_description', '').strip()
 
         errors = []
         if not vehicle_id:
             errors.append('Please select a vehicle.')
-        if not date:
+        if not appointment_date:
             errors.append('Preferred appointment date is required.')
+        else:
+            try:
+                appointment_date = validate_service_date(appointment_date)
+            except ValueError as error:
+                errors.append(str(error))
         if not service_type:
             errors.append('Service type is required.')
         if not description:
@@ -218,14 +223,16 @@ def request_service():
             for e in errors:
                 flash(e, 'danger')
             return render_template('request_service.html', vehicles=vehicles,
-                                   form_vehicle=vehicle_id, form_date=date,
+                                   form_vehicle=vehicle_id, form_date=appointment_date,
+                                   today=date.today().isoformat(),
                                    form_type=service_type, form_desc=description)
 
-        create_appointment(int(vehicle_id), date, service_type, description)
+        create_appointment(int(vehicle_id), appointment_date, service_type, description)
         flash('Your service request has been submitted. We will be in touch to confirm your appointment.', 'success')
         return redirect(url_for('customer_dashboard') + '#appointments')
 
-    return render_template('request_service.html', vehicles=vehicles)
+    return render_template('request_service.html', vehicles=vehicles,
+                           today=date.today().isoformat())
 
 
 # ── Estimates (FR-12) ─────────────────────────────────────────────────────────
@@ -288,6 +295,18 @@ def staff_dashboard():
     return render_template('staff_dashboard.html', appointments=get_staff_appointments())
 
 
+def validate_service_date(value):
+    try:
+        parsed = date.fromisoformat(value)
+        if parsed.isoformat() != value:
+            raise ValueError()
+    except ValueError:
+        raise ValueError('Please enter a valid appointment date (YYYY-MM-DD).') from None
+    if parsed < date.today():
+        raise ValueError('Appointment date must be today or a future date.')
+    return parsed.isoformat()
+
+
 def money(value):
     try:
         amount = Decimal(value)
@@ -307,7 +326,7 @@ def staff_update(appointment_id, action):
     values = {}
     try:
         if action == 'appointment':
-            values['date'] = date.fromisoformat(request.form.get('appointment_date', '')).isoformat()
+            values['date'] = validate_service_date(request.form.get('appointment_date', '').strip())
             values['status'] = request.form.get('status')
             if values['status'] not in ('Requested', 'Confirmed', 'Rescheduled', 'Canceled'):
                 raise ValueError('Select a valid appointment status.')
