@@ -72,7 +72,7 @@
         <p>Estimate approval required before starting.</p>
         {% endif %}
 
-        <!-- COMPLETE OR CANCEL -->
+        <!-- COMPLETE -->
         {% elif a.status == 'In Progress' %}
 
         <details class="staff-action-details">
@@ -109,24 +109,6 @@
             </form>
         </details>
 
-        <details class="staff-action-details">
-            <summary>Cancel Service</summary>
-
-            <div class="staff-field">
-                <label for="reason-{{ a.appointment_id }}">
-                    Cancellation Reason
-                </label>
-                <textarea id="reason-{{ a.appointment_id }}" name="cancellation_reason" maxlength="5000"
-                    required></textarea>
-            </div>
-
-            <!-- BACKEND: Support In Progress -> Canceled,
-                 save reason, validate transition and confirm cancellation. -->
-            <button type="button" class="btn btn-danger" disabled>
-                Cancel (Backend Pending)
-            </button>
-        </details>
-
         <!-- COMPLETED RECORD -->
         {% elif a.status == 'Completed' %}
         <p><strong>Work:</strong> {{ a.work_performed or 'Not recorded' }}</p>
@@ -138,7 +120,6 @@
         <!-- CANCELED RECORD -->
         {% elif a.status == 'Canceled' %}
         <p>This service was canceled. No further actions available.</p>
-        <!-- BACKEND: Return saved cancellation_reason for display here. -->
         {% endif %}
     </div>
     {% endif %}
