@@ -1,18 +1,25 @@
+<!-- ESTIMATE MANAGEMENT SECTION -->
+<!-- Hidden until staff selects an Estimate button. -->
 <section id="estimates" hidden>
     <h3>Estimate Management</h3>
     <p>Create and update estimated repair costs.</p>
 
     {% for a in appointments %}
+
+    <!-- INDIVIDUAL ESTIMATE CARD -->
     <div id="estimate-{{ a.appointment_id }}" class="estimate-card" hidden>
 
         <h4>Request #{{ a.appointment_id }}</h4>
 
+        <!-- CUSTOMER AND VEHICLE INFORMATION -->
         <p><strong>Customer:</strong> {{ a.customer_name }}</p>
         <p><strong>Vehicle:</strong>
             {{ a.year }} {{ a.make }} {{ a.model }}
         </p>
         <p><strong>Service:</strong> {{ a.service_type }}</p>
 
+        {# ESTIMATE DISPLAY:
+           Check whether an estimated cost already exists. #}
         {% if a.estimated_cost is not none %}
         <p>
             <strong>Current Estimate:</strong>
@@ -22,15 +29,24 @@
             <strong>Approval Status:</strong>
             {{ a.approval_status }}
         </p>
+
         {% else %}
         <p><strong>Current Estimate:</strong> Not provided</p>
         {% endif %}
 
+        {# EDITING RULE:
+           Do not display the estimate form when the
+           service is Completed or Canceled. #}
         {% if a.status not in ['Completed', 'Canceled'] %}
+        
+        <!-- ESTIMATE SUBMISSION FORM -->
         <form method="POST" action="{{ url_for('staff_update', appointment_id=a.appointment_id, action='estimate') }}">
 
+             {# CSRF TOKEN:
+               Sent with the form for backend verification. #}
             <input type="hidden" name="csrf_token" value="{{ session.staff_csrf }}">
 
+             <!-- ESTIMATED REPAIR COST -->
             <label for="estimate-cost-{{ a.appointment_id }}">
                 Estimated Repair Cost ($)
             </label>
@@ -42,6 +58,7 @@
         </form>
         {% endif %}
 
+        <!-- SUBMIT ESTIMATE TO FLASK -->
         <button type="button" onclick="closeEstimate()">
             Close
         </button>
@@ -50,15 +67,23 @@
 </section>
 
 <script>
+    // ======================================================
+    // OPEN ESTIMATE
+    // Called by the Estimate button in requests.html.
+    // Displays the estimate card for the selected request.
+    // ======================================================
     function openEstimate(id) {
         const section = document.getElementById("estimates");
 
+        // Hide all estimate cards before selecting one.
         document.querySelectorAll(".estimate-card").forEach(card => {
             card.hidden = true;
         });
 
+        // Find the card matching the selected appointment ID.
         const selected = document.getElementById("estimate-" + id);
 
+        // Show the section and selected card.
         if (selected) {
             section.hidden = false;
             selected.hidden = false;

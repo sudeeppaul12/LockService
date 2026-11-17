@@ -1,7 +1,10 @@
+<!-- APPOINTMENT MANAGEMENT SECTION -->
+<!-- Hidden initially; shown when staff clicks Review. -->
 <section id="appointments" hidden>
     <h3>Appointment Management</h3>
 
     {% for a in appointments %}
+     <!-- INDIVIDUAL APPOINTMENT DETAILS -->
     <div id="appointment-{{ a.appointment_id }}" class="appointment-detail" hidden>
 
         <h4>Request #{{ a.appointment_id }}</h4>
@@ -13,13 +16,18 @@
         <p><strong>Status:</strong> {{ a.status }}</p>
 
         {% if a.status not in ['Completed', 'Canceled'] %}
-
+        
+        <!-- APPOINTMENT UPDATE FORM -->
+        <!-- POST sends the submitted fields to Flask. -->
         <form class="staff-appointment-form" method="POST"
             action="{{ url_for('staff_update', appointment_id=a.appointment_id, action='appointment') }}">
 
+            {# CSRF TOKEN:
+               Sent with the form for backend verification. #}
             <input type="hidden" name="csrf_token" value="{{ session.staff_csrf }}">
 
             <div class="staff-form-grid">
+
                 <div class="staff-field">
                     <label for="date-{{ a.appointment_id }}">
                         Appointment Date
@@ -32,6 +40,7 @@
                     <label for="status-{{ a.appointment_id }}">
                         Status
                     </label>
+                    {# Generate the available status options. #}
                     <select id="status-{{ a.appointment_id }}" name="status">
                         {% for status in ['Requested', 'Confirmed', 'Rescheduled', 'Canceled'] %}
                         <option value="{{ status }}" {% if a.status==status %}selected{% endif %}>
@@ -42,11 +51,13 @@
                 </div>
             </div>
 
+            <!-- STAFF INSTRUCTIONS -->
             <p class="staff-form-hint">
                 Set status to <strong>Rescheduled</strong> to propose a new date — the customer
                 will be asked to confirm or decline it on their dashboard.
             </p>
 
+            <!-- SUBMIT APPOINTMENT UPDATE -->
             <div class="staff-form-actions">
                 <button type="submit" class="btn btn-primary">
                     Save Appointment
@@ -59,7 +70,13 @@
     {% endfor %}
 </section>
 
+    
 <script>
+    // ======================================================
+    // REVIEW APPOINTMENT
+    // Called by the Review button in requests.html.
+    // Shows the selected appointment without changing pages.
+    // ======================================================
     function reviewAppointment(id) {
         const section = document.getElementById("appointments");
         section.hidden = false;
@@ -68,6 +85,7 @@
             detail.hidden = true;
         });
 
+        // Find the appointment matching the selected ID.
         const selected = document.getElementById("appointment-" + id);
 
         if (selected) {

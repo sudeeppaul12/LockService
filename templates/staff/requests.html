@@ -1,7 +1,9 @@
+<!-- MAIN REQUESTS SECTION -->
 <section id="requests">
     <h3>Incoming Service Requests</h3>
     <p>Review requests submitted by customers.</p>
 
+    <!-- REQUESTS TABLE -->
     <table id="requests-table">
         <thead>
             <tr>
@@ -14,24 +16,38 @@
             </tr>
         </thead>
 
+        <!-- TABLE BODY: DYNAMIC APPOINTMENT RECORDS -->
         <tbody id="requests-table-body">
-            {% for a in appointments %}
+
+            {# Loop through every appointment provided by Flask.
+               'a' represents one appointment record. #}
+            {% for a in appointments if a.status not in ['Completed', 'Canceled'] %}
+            
+            {# Only display active requests. 
+                Completed and Canceled records remain in the database
+                and can still be viewed in other dashboard sections. #}
+
             <tr>
                 <td>{{ a.customer_name }}</td>
                 <td>{{ a.year }} {{ a.make }} {{ a.model }}</td>
                 <td>{{ a.service_type }}</td>
                 <td>{{ a.appointment_date }}</td>
                 <td>{{ a.status }}</td>
+
+                 <!-- ACTION BUTTONS -->
                 <td>
+
+                    {# REVIEW BUTTON:
+                       Calls reviewAppointment(id), a JavaScript
+                       function defined in appointments.html.
+                       Opens the selected appointment details. #}
                     <button type="button" onclick="reviewAppointment('{{ a.appointment_id }}')">
                         Review
                     </button>
-                
-                    {% if a.status not in ['Canceled', 'Completed'] %}
+            
                     <button type="button" onclick="openEstimate('{{ a.appointment_id }}')">
                         Estimate
                     </button>
-                    {% endif %}
                 </td>
 
             </tr>

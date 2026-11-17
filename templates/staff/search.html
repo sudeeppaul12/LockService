@@ -1,12 +1,17 @@
+<!-- SEARCH SECTION -->
 <section id="search">
     <h3>Customer and Vehicle Search</h3>
     <p>Find service records by customer name, email, or VIN.</p>
 
+    <!-- SEARCH INPUT -->
     <label for="search-input">Search Records</label>
     <input type="search" id="search-input" placeholder="Enter name, email, make, model, or VIN...">
 
+    <!-- SEARCH FEEDBACK MESSAGE -->
     <p id="search-message">Start typing to search.</p>
 
+    <!-- SEARCH RESULTS TABLE -->
+    <!-- Initially hidden until matching records are found. -->
     <table id="search-results" hidden>
         <thead>
             <tr>
@@ -17,7 +22,13 @@
             </tr>
         </thead>
         <tbody>
+
+            {# Generate one searchable row per appointment. #}
             {% for a in appointments %}
+
+            <!-- SEARCHABLE APPOINTMENT ROW -->
+            <!-- data-* attributes store searchable values
+                 for JavaScript to read using row.dataset. -->
             <tr data-name="{{ (a.customer_name or '')|lower }}" data-email="{{ (a.customer_email or '')|lower }}"
                 data-vin="{{ (a.vin or '')|lower }}"
                 data-make="{{ (a.make or '')|lower }}" data-model="{{ (a.model or '')|lower }}">
@@ -44,20 +55,30 @@
 </section>
 
 <script>
+    // SEARCH ELEMENT REFERENCES
     const searchInput = document.getElementById("search-input");
     const searchTable = document.getElementById("search-results");
     const searchRows = document.querySelectorAll("#search-results tbody tr");
     const searchMessage = document.getElementById("search-message");
 
+    // SEARCH INPUT EVENT LISTENER
+    // Runs whenever the user changes the search text
     searchInput.addEventListener("input", function () {
         const query = this.value.trim().toLowerCase();
         let matches = 0;
 
+        // SEARCH MATCHING LOGIC
+        // Examine each appointment row.
         searchRows.forEach(row => {
+
+            // CUSTOMER NAME:
+            // Split into words and check whether any word
+            // starts with the entered query.
             const nameMatch = row.dataset.name
                 .split(/\s+/)
                 .some(word => word.startsWith(query));
 
+            // Check whether each value starts with the query.
             const emailMatch = row.dataset.email.startsWith(query);
             const vinMatch = row.dataset.vin.startsWith(query);
             const makeMatch = row.dataset.make.startsWith(query);
@@ -66,7 +87,10 @@
             const found = query !== "" &&
                 (nameMatch || emailMatch || vinMatch || makeMatch || modelMatch);
 
+            // Show matching rows; hide nonmatching rows. 
             row.hidden = !found;
+
+            // Increment the result count.
             if (found) matches++;
         });
 

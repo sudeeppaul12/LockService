@@ -1,13 +1,21 @@
+{# Inherits the layout from base.html#}
 {% extends "base.html" %}
 
 {% block title %}Staff Dashboard - LockService{% endblock %}
 
+{# main page content inserted into the base layout #}
 {% block content %}
 
 <div class="page-header">
     <h2>Staff Dashboard</h2>
     <p>Manage service requests, appointments, and repairs.</p>
 </div>
+
+
+{# ==========================================================
+   STAFF FEATURE MODULES
+   Each include inserts a separate HTML template.
+   ========================================================== #}
 
 {% include "staff/requests.html" %}
 {% include "staff/appointments.html" %}

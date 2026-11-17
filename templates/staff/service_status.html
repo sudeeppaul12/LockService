@@ -1,18 +1,26 @@
+<!-- SERVICE STATUS SECTION -->
 <section id="status">
     <h3>Service Status</h3>
 
+    <!-- SERVICE REQUEST SELECTOR -->
     <label for="service-select">Service Request</label>
     <select id="service-select">
         <option value="">Select a request</option>
+
+        {# Show only requests that have reached a service
+           stage or have been canceled. #}
         {% for a in appointments %}
         {% if a.status in ['Confirmed', 'In Progress', 'Completed', 'Canceled'] %}
+        
         <option value="{{ a.appointment_id }}">
             #{{ a.appointment_id }} - {{ a.customer_name }} - {{ a.make }} {{ a.model }}
         </option>
+
         {% endif %}
         {% endfor %}
     </select>
 
+    {# Create a detail panel for every eligible service. #}
     {% for a in appointments %}
     {% if a.status in ['Confirmed', 'In Progress', 'Completed', 'Canceled'] %}
     <div id="service-{{ a.appointment_id }}" class="service-detail" hidden>
@@ -22,6 +30,9 @@
         <p><strong>Service:</strong> {{ a.service_type }}</p>
         <p><strong>Status:</strong> {{ a.status }}</p>
 
+        {# PROGRESS INDICATOR:
+           Map each active/completed status to a number.
+           Canceled services do not display a progress bar. #}
         {% if a.status != 'Canceled' %}
         {% set level = {'Confirmed': 1, 'In Progress': 2, 'Completed': 3}[a.status] %}
 
@@ -54,6 +65,7 @@
                 <p><strong>Start this service?</strong></p>
                 <p>The status will advance to In Progress.</p>
 
+                <!-- START SERVICE FORM -->
                 <form method="POST"
                     action="{{ url_for('staff_update', appointment_id=a.appointment_id, action='status') }}">
 
@@ -69,8 +81,11 @@
         </details>
 
         {% else %}
+
+        <!-- ESTIMATE NOT YET APPROVED -->
         <p>Estimate approval required before starting.</p>
         {% endif %}
+
 
         <!-- COMPLETE -->
         {% elif a.status == 'In Progress' %}
@@ -84,25 +99,30 @@
 
                 <input type="hidden" name="csrf_token" value="{{ session.staff_csrf }}">
 
+                <!-- REQUEST THE COMPLETED STATUS -->
                 <input type="hidden" name="status" value="Completed">
 
+                <!-- REQUIRED WORK DESCRIPTION -->
                 <div class="staff-field">
                     <label for="work-{{ a.appointment_id }}">Work Performed</label>
                     <textarea id="work-{{ a.appointment_id }}" name="work_performed" maxlength="5000"
                         required></textarea>
                 </div>
 
+                <!-- REQUIRED FINAL COST -->
                 <div class="staff-field">
                     <label for="cost-{{ a.appointment_id }}">Final Price ($)</label>
                     <input type="number" id="cost-{{ a.appointment_id }}" name="final_cost" min="0" max="1000000"
                         step="0.01" required>
                 </div>
 
+                <!-- OPTIONAL SERVICE NOTES -->
                 <div class="staff-field">
                     <label for="notes-{{ a.appointment_id }}">Notes (optional)</label>
                     <textarea id="notes-{{ a.appointment_id }}" name="notes" maxlength="5000"></textarea>
                 </div>
 
+                <!-- SUBMIT COMPLETED SERVICE RECORD -->
                 <button type="submit" class="btn btn-success">
                     Save and Complete
                 </button>
@@ -127,8 +147,18 @@
 </section>
 
 <script>
+    
+    // ======================================================
+    // SERVICE SELECTION
+    // Displays the service details matching the selected ID.
+    // No backend request is made when changing the dropdown.
+    // ======================================================
+
     document.getElementById("service-select").addEventListener("change", function () {
+
         document.querySelectorAll(".service-detail").forEach(d => d.hidden = true);
+       
+        // Display the selected service if an ID was chosen.
         if (this.value) document.getElementById("service-" + this.value).hidden = false;
     });
 </script>
