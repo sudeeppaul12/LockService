@@ -1,10 +1,34 @@
 # LockService
 
+## Dependencies
+
+**Python 3.9+** is required. The only third-party packages are:
+
+| Package | Version | Purpose |
+|   ---   |   ---   |   ---   |  
+| Flask | 3.1.3 | Web framework and session management |
+| Werkzeug | 3.1.9 | Password hashing (`generate_password_hash` / `check_password_hash`) |
+
+Everything else (`sqlite3`, `json`, `datetime`, `hmac`, `secrets`, etc.) is part of the Python standard library — no additional installs needed beyond the two above.
+
+Install all dependencies at once:
+
+```sh
+pip install -r requirements.txt
+```
+
+Or set up an isolated virtual environment first (recommended):
+
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
 ## Start
 
 ```sh
 source .venv/bin/activate
-pip install Flask
 export SECRET_KEY='replace-with-a-long-random-secret'
 export STAFF_INVITE_CODE='replace-with-a-private-staff-invitation-code'
 flask --app app run --debug
@@ -28,8 +52,26 @@ existing records are preserved. The database is excluded from version control.
 
 ## Test
 
+The test suite lives in the `tests/` directory and is split across three files:
+
+- **`test_auth.py`** — covers registration and login: password hashing, email normalization, session creation, and redirect behavior after sign-in.
+- **`test_backend.py`** — covers database operations and Flask route logic end-to-end: user creation, vehicle management, appointment creation, estimate flow, and service completion.
+- **`test_workflow.py`** — covers the full staff/customer lifecycle: staff reviewing requests, setting appointments, sending estimates, customers accepting or rejecting, and marking services complete or canceled.
+
+Each test file spins up a disposable SQLite database in a temp directory, so no setup or teardown of a real database is needed. Tests are fully isolated and safe to run repeatedly.
+
+To run the full suite:
+
 ```sh
 python -m unittest discover -s tests -v
+```
+
+To run a single file:
+
+```sh
+python -m unittest tests.test_auth -v
+python -m unittest tests.test_backend -v
+python -m unittest tests.test_workflow -v
 ```
 
 Staff invitation codes can also be stored as a JSON array in

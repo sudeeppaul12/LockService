@@ -30,6 +30,7 @@ init_db()
 
 
 def login_required(role=None):
+    """Decorator that requires an active session, optionally restricted to a specific role."""
     def decorator(f):
         @functools.wraps(f)
         def wrapped(*args, **kwargs):
@@ -291,11 +292,13 @@ def service_history():
 @app.route('/staff')
 @login_required(role='staff')
 def staff_dashboard():
+    # Lazily generate a per-session CSRF token used by all staff mutation forms.
     session.setdefault('staff_csrf', secrets.token_hex(32))
     return render_template('staff_dashboard.html', appointments=get_staff_appointments())
 
 
 def validate_service_date(value):
+    """Parse and validate an ISO date string; raises ValueError for past dates or bad format."""
     try:
         parsed = date.fromisoformat(value)
         if parsed.isoformat() != value:
@@ -308,6 +311,7 @@ def validate_service_date(value):
 
 
 def money(value):
+    """Parse a monetary string and return a float; raises ValueError for negatives, >2 decimal places, or non-numeric input."""
     try:
         amount = Decimal(value)
         if not amount.is_finite() or amount < 0 or amount > 1000000 or amount != amount.quantize(Decimal('0.01')):
@@ -320,6 +324,11 @@ def money(value):
 @app.post('/staff/appointments/<int:appointment_id>/<action>')
 @login_required(role='staff')
 def staff_update(appointment_id, action):
+    """
+    Handle all staff mutations for a single appointment.
+    Validates the CSRF token, parses form values per action type, then delegates to
+    update_staff_appointment. Action must be one of: 'appointment', 'estimate', 'status'.
+    """
     token = request.form.get('csrf_token', '')
     if not session.get('staff_csrf') or not hmac.compare_digest(session['staff_csrf'], token):
         abort(400)

@@ -5,6 +5,7 @@ DB_PATH = os.path.join(os.path.dirname(__file__), 'lockservice.db')
 
 
 def get_db():
+    """Return a connection with Row access and foreign-key enforcement enabled."""
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
@@ -12,6 +13,7 @@ def get_db():
 
 
 def init_db():
+    """Create all tables if they don't exist. Safe to call on every startup."""
     conn = get_db()
     c = conn.cursor()
 
@@ -151,6 +153,7 @@ def get_pending_estimates_for_user(user_id):
 
 
 def respond_to_estimate(estimate_id, decision, user_id):
+    """Record the customer's Approved/Declined decision. Declining also cancels the appointment."""
     conn = get_db()
     try:
         with conn:
@@ -172,6 +175,7 @@ def respond_to_estimate(estimate_id, decision, user_id):
 # ── Reschedule confirmation helper ──────────────────────────────────────────
 
 def confirm_reschedule(appointment_id, user_id, decision):
+    """Let the customer confirm or cancel a staff-rescheduled appointment. Returns False if not found or wrong state."""
     conn = get_db()
     try:
         with conn:
@@ -220,6 +224,7 @@ def get_user_by_email(email):
 
 
 def create_user(name, email, password_hash, role='customer'):
+    """Insert a new user and return the generated user_id. Email is lowercased before saving."""
     conn = get_db()
     try:
         with conn:
@@ -249,6 +254,13 @@ def get_staff_appointments():
 
 
 def update_staff_appointment(appointment_id, staff_id, action, values):
+    """
+    Dispatch a staff mutation to one of three sub-actions:
+      'appointment' — update date/status/assigned staff
+      'estimate'    — upsert an estimate (always resets approval to Pending)
+      'status'      — advance to In Progress or Completed; Completed also writes a service_record
+    Raises LookupError if not found, ValueError if already Completed/Canceled.
+    """
     conn = get_db()
     try:
         with conn:
